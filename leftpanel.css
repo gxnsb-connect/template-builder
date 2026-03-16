@@ -1,0 +1,121 @@
+/* ════════════════════════════════════════
+   LEFT PANEL TABS
+   ════════════════════════════════════════ */
+
+.left-panel-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.lp-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 8px 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border-bottom: 2px solid transparent;
+  transition: all .15s;
+}
+
+.lp-tab:hover {
+  color: var(--text);
+  background: var(--bg-item);
+}
+
+.lp-tab.active {
+  color: var(--accent2);
+  border-bottom: 2px solid var(--accent2);
+}
+
+
+/* ════════════════════════════════════════
+   TAB CONTENT PANELS
+   ════════════════════════════════════════ */
+
+.lp-tab-content {
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.lp-tab-content.active {
+  display: flex;
+}
+
+
+/* ════════════════════════════════════════
+   PAGE CARDS  (inside Pages tab)
+   ════════════════════════════════════════ */
+
+#pages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+}
+
+.page-card {
+  background: var(--bg-item);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color .15s;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.page-card:hover {
+  border-color: var(--accent2);
+}
+
+.page-card.active-page {
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
+
+.page-card-thumb {
+  width: 32px;
+  height: 42px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: #999;
+}
+
+.page-card-label {
+  flex: 1;
+  font-size: 11px;
+}
+
+.page-card-delete {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.page-card-delete:hover {
+  color: var(--accent);
+}

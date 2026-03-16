@@ -1,0 +1,3041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Document Template Builder</title>
+
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/> -->
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/> -->
+  <!-- <link href="https://cdn.jsdelivr.net/npm/grapesjs@0.21.13/dist/css/grapes.min.css" rel="stylesheet"/> -->
+  <link rel="stylesheet" href="pagestyle.css">
+  <link rel="stylesheet" href="leftpanel.css">
+  <link rel="stylesheet" href="page-style-background.css">
+  <link rel="stylesheet" href="page-style-numbering.css">
+
+
+    <link href="assets/vendors/bootstrap/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Bootstrap Icons -->
+  <link href="assets/vendors/bootstrap-icons/bootstrap-icons.css" rel="stylesheet"/>
+  <!-- GrapesJS -->
+  <link href="assets/vendors/grapesjs/grapes.min.css" rel="stylesheet"/>
+  
+   
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --bg-dark:    #1a1a2e;
+      --bg-panel:   #16213e;
+      --bg-item:    #0f3460;
+      --accent:     #e94560;
+      --accent2:    #4ecdc4;
+      --text:       #e0e0e0;
+      --text-muted: #8892a4;
+      --border:     #2a2a4a;
+      --topbar-h:   48px;
+      --blocks-h:   70px;
+      --sidebar-w:  240px;
+    }
+
+    html, body {
+      margin: 0; padding: 0;
+      height: 50rem !important; width: 100%;
+      background: transparent !important;
+      color: var(--text);
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+      border: 2px solid orange !important;
+    }
+
+    /* ── TOP BAR ── */
+    #topbar {
+      /* position: fixed;
+      top: 0; left: 0; right: 0; */
+      /* height: var(--topbar-h); */
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 8px;
+      /* z-index: 100; */
+      border:2px solid red !important
+    }
+
+    #topbar .brand {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: 1px;
+      margin-right: 8px;
+      text-transform: uppercase;
+    }
+
+    .sep {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+      margin: 0 4px;
+      flex-shrink: 0;
+    }
+
+    .tb-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .tb-btn:hover { background: var(--bg-item); color: var(--text); border-color: var(--border); }
+    .tb-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .tb-input {
+      width: 56px;
+      background: var(--bg-item);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 5px;
+      font-size: 12px;
+    }
+
+    .tb-select {
+      background: var(--bg-item);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .tb-label {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    #topbar-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+
+    /* ── BLOCKS BAR ── */
+    #blocks-bar {
+      /* position: fixed;
+      top: var(--topbar-h); */
+      left: 0; right: 0;
+      height: var(--blocks-h);
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      overflow-y: hidden;
+      z-index: 99;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+    }
+    #blocks-bar::-webkit-scrollbar { height: 3px; }
+    #blocks-bar::-webkit-scrollbar-thumb { background: var(--border); }
+
+    #blocks-container { display: flex; flex-direction: row; align-items: stretch; height: 100%; width: 100%; }
+    #blocks-container .gjs-blocks-cs {
+      display: flex !important; flex-direction: row !important;
+      align-items: stretch !important; height: 100% !important;
+      width: 100% !important; padding: 0 !important; margin: 0 !important;
+    }
+    #blocks-container .gjs-block-category {
+      display: flex !important; flex-direction: column !important;
+      align-items: center !important; border: none !important;
+      border-right: 1px solid var(--border) !important;
+      padding: 0 8px !important; margin: 0 !important;
+      min-width: fit-content;
+    }
+    #blocks-container .gjs-block-category .gjs-title {
+      order: 2; font-size: 9px !important; letter-spacing: 0.8px !important;
+      text-transform: uppercase !important; color: var(--text-muted) !important;
+      background: transparent !important; padding: 2px 0 0 0 !important;
+      text-align: center; width: 100%; border: none !important; cursor: default;
+    }
+    #blocks-container .gjs-blocks-c {
+      order: 1; display: flex !important; flex-direction: row !important;
+      flex-wrap: nowrap !important; align-items: center !important;
+      gap: 3px !important; padding: 4px 0 0 0 !important; margin: 0 !important;
+    }
+    #blocks-container .gjs-block {
+      width: 44px !important; height: 38px !important; min-height: unset !important;
+      padding: 3px 2px !important; margin: 0 !important; display: flex !important;
+      flex-direction: column !important; align-items: center !important;
+      justify-content: center !important; font-size: 9px !important;
+      line-height: 1.2 !important; border-radius: 4px !important;
+      flex-shrink: 0; gap: 2px; text-align: center;
+    }
+    #blocks-container .gjs-block__media { width: 20px !important; height: 20px !important; margin: 0 !important; }
+    #blocks-container .gjs-block__media svg { width: 100% !important; height: 100% !important; }
+    #blocks-container .gjs-block-label { font-size: 8.5px !important; line-height: 1 !important; white-space: nowrap !important; }
+    #blocks-container .gjs-block:hover { background: var(--bg-dark) !important; border-color: var(--accent2) !important; color: var(--accent2) !important; }
+
+    /* ── LAYOUT ── */
+    #app {
+      position: fixed;
+      top: calc(var(--topbar-h) + var(--blocks-h));
+      left: 0; right: 0; bottom: 0;
+      display: flex;
+    }
+
+    .top-nav{
+      /* border:3px solid white !important; */
+      height: 19vh !important;
+      /* margin-top: 5rem !important; */
+      padding: 1rem !important;
+      background-color: black !important;
+    }
+
+    /* ── LEFT SIDEBAR ── */
+    #left-panel {
+      width:30vw !important;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+      height: calc(92.5vh - 100px) !important; 
+      margin-top: .25rem !important;
+      top: 0 !important;
+
+    }
+
+    /* ── CENTER CANVAS ── */
+    #canvas-wrap { flex: 1; overflow: auto !important;
+       position: relative; 
+       border:2px solid red !important;
+       background-color: orange !important;
+       height: 500rem !important;
+      }
+    #gjs { width: 100%; height: 100%; background: transparent !important; }
+
+    /* ── RIGHT SIDEBAR ── */
+    #right-panel {
+      width: var(--sidebar-w);
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .right-section { border-bottom: 1px solid var(--border); padding: 10px; }
+    .right-section-title {
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px;
+      display: flex; align-items: center; gap: 5px;
+    }
+
+    .dim-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .dim-label {
+      font-size: 9px; color: var(--text-muted);
+      display: block; margin-bottom: 2px;
+    }
+    .dim-input {
+      width: 100%;
+      background: var(--bg-item);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 12px;
+    }
+
+    /* ── GRAPES OVERRIDES ── */
+    .gjs-one-bg   { background: transparent !important; }
+    .gjs-two-bg   { background: var(--bg-item)  !important; }
+    .gjs-three-bg { background: var(--bg-dark)  !important; }
+    .gjs-four-color { color: var(--accent2) !important; }
+    .gjs-four-color-h:hover { color: var(--accent2) !important; }
+    .gjs-pn-panels { display: none !important; }
+    .gjs-cv-canvas { background: #23233a !important; }
+    .gjs-block { background: var(--bg-item) !important; border: 1px solid var(--border) !important; color: var(--text) !important; border-radius: 6px !important; }
+    .gjs-block:hover { border-color: var(--accent2) !important; }
+    .gjs-blocks-c { padding: 8px !important; }
+    .gjs-block-category .gjs-title { background: var(--bg-dark) !important; color: var(--text-muted) !important; font-size: 10px !important; letter-spacing: 1px !important; text-transform: uppercase !important; }
+    .gjs-layer-name { color: var(--text) !important; }
+    .gjs-layers { background: var(--bg-panel) !important; }
+    #styles-container .gjs-sm-sector-title { background: var(--bg-dark) !important; color: var(--text-muted) !important; font-size: 10px !important; letter-spacing: 1px !important; }
+    #styles-container .gjs-sm-property { color: var(--text) !important; }
+    #traits-container .gjs-trt-trait { color: var(--text) !important; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* gjs-editor gjs-one-bg gjs-two-color */
+
+
+
+    /* Kill all GrapesJS default panels */
+  .gjs-pn-panels,
+  .gjs-pn-panel,
+  .gjs-pn-views,
+  .gjs-pn-views-container,
+  .gjs-pn-options,
+  .gjs-pn-commands {
+    display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Canvas takes full space */
+  .gjs-editor {
+    width: 100% !important;
+  }
+
+  .gjs-cv-canvas {
+    width: 100% !important;
+    left: 0 !important;
+    top: 0 !important;
+  }
+
+
+  /* Remove GrapesJS views panel completely */
+  .gjs-pn-views-container {
+    display: none !important;
+    width: 0 !important;
+  }
+
+  .gjs-pn-views {
+    display: none !important;
+    width: 0 !important;
+  }
+
+  /* Push canvas to fill entire space */
+  .gjs-cv-canvas {
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+  }
+
+  /* Remove any editor left offset */
+  .gjs-editor-cont {
+    width: 100% !important;
+  }
+
+  .gjs-editor {
+    width: 100% !important;
+    left: 0 !important;
+  }
+
+  /* Hide frame wrapper handles */
+  .gjs-frame-wrapper__top,
+  .gjs-frame-wrapper__right,
+  .gjs-frame-wrapper__left,
+  .gjs-frame-wrapper__bottom {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* Remove frame wrapper offset */
+  .gjs-frame-wrapper {
+    top: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+
+
+  .gjs-editor{
+  border: 2px solid blue !important
+  } 
+
+  .gjs-cv-canvas{
+    border: 2px solid green !important;
+
+  } 
+
+  .gjs-cv-canvas__frames{
+    border: 2px solid orange !important;
+    width: 100% !important;
+    background-color: black !important;
+    z-index: 50  !important;
+    padding: 0 !important;
+    margin: 0 !important;
+
+  }
+  .gjs-cv-canvas__spots{
+    border: 3px solid orange !important;
+  }
+
+  .gjs-cv-canvas__tools{
+  border: 2px solid  black !important;
+  background-color: blue !important;
+  width: 100% !important
+  }
+
+  .gjs-pn-panels{
+  border: 2px solid blue !important;
+  height: 50rem !important;
+  }
+
+  .gjs-frame-wrapper{
+    width: 70vw !important;
+    /* height: 30rem !important; */
+    background-color: green !important;
+    max-height: calc(90.5vh - 100px) !important; 
+    margin-top: .75rem !important;
+  }
+
+  body.landscape .gjs-frame-wrapper {
+  min-width: 99vw !important;
+}
+
+
+  
+.builder-footer{
+  max-height: 5vh !important;
+  height: 5vh !important;
+}
+
+
+
+/* Make categories sit side by side */
+.gjs-block-categories {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  height: 100% !important;
+  gap: 0 !important;
+}
+
+/* Each category = a horizontal section */
+.gjs-block-category {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  border-right: 1px solid var(--border) !important;
+  padding: 0 8px !important;
+  min-width: fit-content;
+}
+
+/* Category title at bottom */
+.gjs-block-category .gjs-title {
+  order: 2 !important;
+  font-size: 9px !important;
+  text-transform: uppercase !important;
+  color: var(--text-muted) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 2px 0 0 0 !important;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Hide the caret arrow */
+.gjs-caret-icon {
+  display: none !important;
+}
+
+/* Blocks row inside each category */
+.gjs-blocks-c {
+  order: 1 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 3px !important;
+  padding: 4px 0 0 0 !important;
+}
+
+/* Hide empty no-category container */
+.gjs-blocks-no-cat {
+  display: none !important;
+}
+
+
+
+
+
+
+
+/* Left panel collapse transition */
+#left-panel {
+  transition: width 0.3s ease, padding 0.3s ease, opacity 0.3s ease;
+  overflow: hidden;
+}
+
+#left-panel.collapsed {
+  width: 0 !important;
+  padding: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Toggle button */
+#left-panel-toggle {
+  position: fixed;
+  top: calc(var(--topbar-h) + var(--blocks-h) + 10px);
+  left: 8px;
+  z-index: 200;
+  background: var(--bg-item);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: left 0.3s ease;
+}
+
+#left-panel-toggle.visible {
+  display: flex;
+}
+
+
+
+</style>
+</head>
+<body>
+  <nav class="navbar top-nav navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid d-block px-2 py-2 border">
+      <!-- TOP BAR -->
+      <div id="topbar" class="w-100">
+        <span class="brand">DocBuilder</span>
+        <div class="sep"></div>
+
+        <select id="device-select" class="tb-select">
+          <option value="A4 Portrait">A4 Portrait</option>
+          <option value="A4 Landscape">A4 Landscape</option>
+        </select>
+
+        <div class="sep"></div>
+
+        <!-- Page size inputs -->
+        <span class="tb-label">W</span>
+        <input id="page-width"  class="tb-input" type="number" value="794" min="100"/>
+        <span class="tb-label">H</span>
+        <input id="page-height" class="tb-input" type="number" value="1123" min="100"/>
+        <select id="page-unit" class="tb-select" style="width:50px;">
+          <option value="px">px</option>
+          <option value="mm">mm</option>
+        </select>
+
+        <div class="sep"></div>
+
+        <!-- Page margin inputs
+        <span class="tb-label">Margins:</span>
+        <span class="tb-label">T</span>
+        <input id="margin-top"    class="tb-input" type="number" value="60"  min="0" style="width:44px;"/>
+        <span class="tb-label">R</span>
+        <input id="margin-right"  class="tb-input" type="number" value="70"  min="0" style="width:44px;"/>
+        <span class="tb-label">B</span>
+        <input id="margin-bottom" class="tb-input" type="number" value="60"  min="0" style="width:44px;"/>
+        <span class="tb-label">L</span>
+        <input id="margin-left"   class="tb-input" type="number" value="70"  min="0" style="width:44px;"/> -->
+
+        <div class="sep"></div>
+
+        <button class="tb-btn" id="btn-add-page" title="Add Page">
+          <i class="bi bi-file-earmark-plus"></i> Add Page
+        </button>
+        <button class="tb-btn" id="btn-undo"><i class="bi bi-arrow-counterclockwise"></i></button>
+        <button class="tb-btn" id="btn-redo"><i class="bi bi-arrow-clockwise"></i></button>
+        <button class="tb-btn" id="btn-preview"><i class="bi bi-eye"></i> Preview</button>
+
+        <div id="topbar-right">
+          <button class="tb-btn" id="btn-export"><i class="bi bi-download"></i> Export</button>
+          <button class="tb-btn active" id="btn-save"><i class="bi bi-floppy"></i> Save</button>
+        </div>
+      </div>
+      <!-- BLOCKS BAR -->
+      <div id="blocks-bar" class="w-100">
+        <div id="blocks-container" class="w-100 border"></div>
+      </div>
+    </div>
+  </nav>
+  
+
+
+
+
+  <!-- MAIN LAYOUT -->
+  <button id="left-panel-toggle" title="Toggle Sidebar">
+    <i class="bi bi-layout-sidebar"></i>
+  </button>
+
+  <div id="app">
+
+<!-- LEFT SIDEBAR -->
+  <!-- LEFT SIDEBAR -->
+  <div id="left-panel">
+
+    <!-- Tab Buttons -->
+    <div class="left-panel-tabs">
+      <button class="lp-tab active" data-target="tab-pages">
+        <i class="bi bi-file-earmark-text"></i> Pages
+      </button>
+      <button class="lp-tab" data-target="tab-layers">
+        <i class="bi bi-layers"></i> Layers
+      </button>
+    </div>
+
+    <!-- Tab: Pages -->
+    <div class="lp-tab-content active" id="tab-pages">
+      <div id="pages-list">
+        <!-- Page cards injected by JS -->
+      </div>
+    </div>
+
+    <!-- Tab: Layers -->
+    <div class="lp-tab-content" id="tab-layers">
+      <div id="layers-container"></div>
+    </div>
+
+  </div>
+
+    <!-- CANVAS -->
+    <div id="canvas-wrap">
+      <div id="gjs"></div>
+    </div>
+
+    <!-- RIGHT: Properties -->
+ 
+  </div>
+
+<nav class="navbar navbar-dark bg-dark fixed-bottom builder-footer px-3">
+  <div class="d-flex align-items-center gap-3 w-100">
+
+    <!-- Template Name Input -->
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-file-earmark-text text-muted" style="font-size:13px;"></i>
+      <input
+        id="template-name"
+        type="text"
+        class="form-control form-control-sm"
+        placeholder="Template name..."
+        style="width:180px; background:var(--bg-item); color:var(--text); border:1px solid var(--border); font-size:12px;"
+      />
+    </div>
+
+    <div class="vr opacity-25"></div>
+
+    <!-- Page Style Dropdown -->
+    <div class="d-flex align-items-center gap-2">
+      <button
+        class="btn btn-sm d-flex align-items-center gap-1"
+        style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);font-size:12px;"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#page-style-panel"
+        aria-expanded="false"
+      >
+        <i class="bi bi-palette"></i> Page Style
+      </button>
+
+      <!-- Page Style Panel -->
+      <!-- Page Style Dropdown -->
+      <div class="d-flex align-items-center gap-2 position-relative">
+  <button
+    class="btn btn-sm d-flex align-items-center gap-1"
+    id="btn-page-style-toggle"
+    style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);font-size:12px;"
+    type="button"
+  >
+    <i class="bi bi-palette"></i> Page Style
+  </button>
+
+  <div id="page-style-menu"
+    style="display:none;background:var(--bg-panel);border:1px solid var(--border);
+    position:absolute;bottom:44px;left:0;min-width:180px;z-index:300;border-radius:6px;">
+
+    <div class="d-flex justify-content-between align-items-center px-2 pt-2 pb-1"
+      style="border-bottom:1px solid var(--border);">
+      <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">Page Style</span>
+      <button type="button" id="btn-close-page-style"
+        style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;line-height:1;padding:0;">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <ul class="list-unstyled mb-0 py-1">
+      <li><button class="ps-menu-item" data-modal="#modal-page-margin"><i class="bi bi-layout-sidebar-inset"></i> Page Margin</button></li>
+      <li><button class="ps-menu-item" data-modal="#modal-page-border"><i class="bi bi-border-outer"></i> Page Border</button></li>
+      <li><button class="ps-menu-item" data-modal="#modal-page-background"><i class="bi bi-palette2"></i> Page Color</button></li>
+      <li><button class="ps-menu-item" data-modal="#modal-page-numbering"><i class="bi bi-list-ol"></i> Page Numbering</button></li>
+      <li><button class="ps-menu-item" data-modal="#modal-page-header"><i class="bi bi-layout-text-window-reverse"></i> Header</button></li>
+      <li><button class="ps-menu-item" data-modal="#modal-page-footer"><i class="bi bi-layout-text-window"></i> Footer</button></li>
+    </ul>
+  </div>
+</div>
+    </div>
+
+    <div class="vr opacity-25"></div>
+
+    <!-- Placeholders Dropdown -->
+    <div class="d-flex align-items-center gap-2">
+      <button
+        class="btn btn-sm d-flex align-items-center gap-1"
+        style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);font-size:12px;"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#placeholders-panel"
+        aria-expanded="false"
+      >
+        <i class="bi bi-braces"></i> Placeholders
+      </button>
+
+      <!-- Placeholders Panel -->
+      <div class="collapse" id="placeholders-panel">
+        <div class="p-2 rounded"
+          style="background:var(--bg-panel);border:1px solid var(--border);position:absolute;bottom:48px;left:0;min-width:300px;z-index:300;">
+
+          <button
+            class="btn-close btn-close-white btn-sm position-absolute"
+            style="top:6px;right:6px;font-size:10px;"
+            data-bs-toggle="collapse"
+            data-bs-target="#placeholders-panel"
+            aria-label="Close">
+          </button>
+
+          <div class="d-flex flex-column gap-2 w-100 pt-2">
+            <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Placeholders</span>
+
+            <div class="input-group input-group-sm">
+              <input type="text" id="placeholder-input" class="form-control form-control-sm"
+                placeholder="e.g. client_name"
+                style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);font-size:11px;"/>
+              <button class="btn btn-sm" id="btn-add-placeholder"
+                style="background:var(--accent2);color:#000;border:none;font-size:11px;">
+                <i class="bi bi-plus"></i> Add
+              </button>
+            </div>
+
+            <div id="placeholders-list" class="d-flex flex-wrap gap-1 mt-1">
+              <!-- populated by JS -->
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</nav>
+
+  <script src="assets/vendors/bootstrap/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendors/grapesjs/grapes.min.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/grapesjs@0.21.13/dist/grapes.min.js"></script> -->
+
+
+  <script>
+
+    // ── PAGE CONFIG ──
+    const pageConfig = {
+      width:   794,
+      height:  1123,
+      unit:    'px',
+      padding: { top: 60, right: 70, bottom: 60, left: 70 },
+    };
+
+    // ── INIT ──
+    const editor = grapesjs.init({
+      container: '#gjs',
+      height: '100%',
+      width:  '100%',
+      storageManager: false,
+
+
+      deviceManager: {
+        devices: [
+          { name: 'A4 Portrait',  width: '794px',  height: '1123px' },
+          { name: 'A4 Landscape', width: '1123px', height: '794px'  },
+        ]
+      },
+
+      blockManager:  { appendTo: '#blocks-container' },
+      layerManager:  { appendTo: '#layers-container' },
+      styleManager:  { appendTo: '#styles-container' },
+      traitManager:  { appendTo: '#traits-container' },
+      panels:        { defaults: [] },
+    });
+
+
+    // ── COMPONENT TYPES — must be before load ──
+editor.Components.addType('page', {
+  isComponent: el => el.classList && el.classList.contains('page'),
+  model: {
+    defaults: {
+      tagName: 'div',
+      attributes: { class: 'page' },
+      droppable: false,
+      draggable: false,
+      removable: false,
+      copyable: false,
+      selectable: false,
+      hoverable: false,
+    }
+  }
+});
+
+editor.Components.addType('page-content', {
+  isComponent: el => el.classList && el.classList.contains('page-content'),
+  model: {
+    defaults: {
+      tagName: 'div',
+      attributes: { class: 'page-content' },
+      droppable: true,
+      draggable: false,
+      removable: false,
+      copyable: false,
+      selectable: false,
+      hoverable: false,
+    }
+  }
+});
+
+editor.Components.addType('page-border-frame', {
+  isComponent: el => el.classList && el.classList.contains('page-border-frame'),
+  model: {
+    defaults: {
+      tagName: 'div',
+      attributes: { class: 'page-border-frame' },
+      droppable: false,
+      draggable: false,
+      removable: false,
+      copyable: false,
+      selectable: false,
+      hoverable: false,
+    }
+  }
+});
+
+
+// ── ADD THIS BLOCK AFTER THE page-border-frame addType block (after line 827) ──
+
+editor.Components.addType('page-header', {
+  isComponent: el => el.classList && el.classList.contains('page-header'),
+  model: {
+    defaults: {
+      tagName: 'div',
+      attributes: { class: 'page-header' },
+      droppable: false,
+      draggable: false,
+      removable: false,
+      copyable: false,
+      selectable: false,
+      hoverable: false,
+    }
+  }
+});
+
+// ── ADD THIS directly after the page-header addType block ──
+
+editor.Components.addType('page-footer', {
+  isComponent: el => el.classList && el.classList.contains('page-footer'),
+  model: {
+    defaults: {
+      tagName: 'div',
+      attributes: { class: 'page-footer' },
+      droppable: false,
+      draggable: false,
+      removable: false,
+      copyable: false,
+      selectable: false,
+      hoverable: false,
+    }
+  }
+});
+
+
+
+
+
+    // ── CANVAS + PAGE STYLES ──
+    function buildPageCSS() {
+      const { width, height, unit, padding: p } = pageConfig;
+      const w = `${width}${unit}`;
+      const h = `${height}${unit}`;
+
+      return `
+        html, body {
+          margin: 0;
+          padding: 0;
+          background: #2b2b3b;
+        }
+
+        /* Canvas holder — scrollable, padded on all sides */
+        body {
+          min-width: 100%;
+          // min-height: 100%;
+          padding: 60px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 30px;
+          box-sizing: border-box;
+        }
+
+        /* Page — white A4 sheet, all edges visible */
+        .page {
+          background: #ffffff;
+          width: ${w};
+          min-height: ${h};
+          position: relative;
+          box-sizing: border-box;
+          flex-shrink: 0;
+          box-shadow: none !important;
+          border: 1px solid rgba(128, 128, 128, 0.5);
+          margin-bottom:2rem !important;
+          border-radius:.25rem;
+        }
+        /* Dashed margin guide */
+        .page-content {
+          position: absolute;
+          top: ${p.top}px;
+          right: ${p.right}px;
+          bottom: ${p.bottom}px;
+          left: ${p.left}px;
+          min-height: calc(${h} - ${p.top + p.bottom}px);
+          border: 1px dashed rgba(100, 149, 237, 0.45);
+          box-sizing: border-box;
+          z-index: 2;
+        }
+        /* Border frame — user border lives here, behind content */
+        .page-border-frame {
+          position: absolute;
+          inset: 32px;
+          pointer-events: none;
+          z-index: 1;
+          box-sizing: border-box;
+        }
+        .page-border-frame.gjs-selected,
+        .page-border-frame.gjs-hovered {
+          outline: none !important;
+          box-shadow: none !important;
+        }
+        /* Remove selection outline on page and page-content only */
+        .page.gjs-selected,
+        .page.gjs-hovered,
+        .page-content.gjs-selected,
+        .page-content.gjs-hovered {
+          outline: none !important;
+          box-shadow: none !important;
+        }
+      `;
+    }
+
+
+// ── REPLACE the entire applyPageStyle() function (lines 910–921) ──
+// ── REPLACE the entire applyPageStyle() function ──
+
+      function applyPageStyle() {
+        const canvasDoc = editor.Canvas.getDocument();
+        if (!canvasDoc) return;
+
+        let styleTag = canvasDoc.getElementById('page-style');
+        if (!styleTag) {
+          styleTag = canvasDoc.createElement('style');
+          styleTag.id = 'page-style';
+          canvasDoc.head.appendChild(styleTag);
+        }
+        styleTag.innerHTML = buildPageCSS();
+
+        // Notify header — guard in case script not loaded yet
+        if (typeof applyHeaderStyleTag === 'function') {
+          applyHeaderStyleTag();
+        }
+
+        // Notify footer — guard in case script not loaded yet
+        if (typeof applyFooterStyleTag === 'function') {
+          applyFooterStyleTag();
+        }
+      }
+
+
+    // ── INITIAL CONTENT ──
+    // ── REPLACE the entire buildPageHTML() function (lines 924–929) ──
+// ── REPLACE the entire buildPageHTML() function ──
+
+    function buildPageHTML() {
+      return `<div class="page" data-gjs-type="page">
+        <div class="page-header" data-gjs-type="page-header">
+          <table class="page-header-table">
+            <tr>
+              <td class="page-header-cell ph-left"   data-col="left"></td>
+              <td class="page-header-cell ph-center" data-col="center"></td>
+              <td class="page-header-cell ph-right"  data-col="right"></td>
+            </tr>
+          </table>
+        </div>
+        <div class="page-border-frame" data-gjs-type="page-border-frame"></div>
+        <div class="page-content"      data-gjs-type="page-content"></div>
+        <div class="page-footer" data-gjs-type="page-footer">
+          <table class="page-footer-table">
+            <tr>
+              <td class="page-footer-cell pf-left"   data-col="left"></td>
+              <td class="page-footer-cell pf-center" data-col="center"></td>
+              <td class="page-footer-cell pf-right"  data-col="right"></td>
+            </tr>
+          </table>
+        </div>
+      </div>`;
+    }
+
+    editor.on('load', () => {
+
+      // Disable drop on the root wrapper
+      editor.getWrapper().set('droppable', false);
+
+
+      applyPageStyle();
+      // Set initial 2 pages
+      editor.setComponents(`
+        ${buildPageHTML()}
+      `);
+    });
+
+
+
+    // ── ADD PAGE ──
+    document.getElementById('btn-add-page').addEventListener('click', () => {
+      const wrapper = editor.getWrapper();
+      wrapper.append(buildPageHTML());
+    });
+
+    // ── DEVICE SWITCHER ──
+    // ── DEVICE SWITCHER ──
+    document.getElementById('device-select').addEventListener('change', (e) => {
+      const val = e.target.value;
+      editor.setDevice(val);
+
+    if (val === 'A4 Landscape') {
+      pageConfig.width  = 1123;
+      pageConfig.height = 794;
+      document.getElementById('left-panel').classList.add('collapsed');
+      document.getElementById('left-panel-toggle').classList.add('visible');
+      document.body.classList.add('landscape');        // 👈 add
+    } else {
+      pageConfig.width  = 794;
+      pageConfig.height = 1123;
+      document.getElementById('left-panel').classList.remove('collapsed');
+      document.getElementById('left-panel-toggle').classList.remove('visible');
+      document.body.classList.remove('landscape');     // 👈 remove
+    }
+
+      syncPageInputs();
+      setTimeout(() => applyPageStyle(), 100);
+    });
+
+    // ── TOGGLE BUTTON ──
+    document.getElementById('left-panel-toggle').addEventListener('click', () => {
+      const panel = document.getElementById('left-panel');
+      panel.classList.toggle('collapsed');
+    });
+
+    // ── PAGE SIZE INPUTS ──
+    function syncPageInputs() {
+      document.getElementById('page-width').value    = pageConfig.width;
+      document.getElementById('page-height').value   = pageConfig.height;
+      document.getElementById('page-unit').value     = pageConfig.unit;
+      document.getElementById('margin-top').value    = pageConfig.padding.top;
+      document.getElementById('margin-right').value  = pageConfig.padding.right;
+      document.getElementById('margin-bottom').value = pageConfig.padding.bottom;
+      document.getElementById('margin-left').value   = pageConfig.padding.left;
+    }
+
+    document.getElementById('page-width').addEventListener('change',  (e) => { pageConfig.width  = parseInt(e.target.value) || 794;  applyPageStyle(); });
+    document.getElementById('page-height').addEventListener('change', (e) => { pageConfig.height = parseInt(e.target.value) || 1123; applyPageStyle(); });
+    document.getElementById('page-unit').addEventListener('change',   (e) => { pageConfig.unit   = e.target.value;                   applyPageStyle(); });
+
+    // ── MARGIN INPUT LISTENERS (null-guarded — inputs live inside modal HTML below) ──
+    const _mTop    = document.getElementById('margin-top');
+    const _mRight  = document.getElementById('margin-right');
+    const _mBottom = document.getElementById('margin-bottom');
+    const _mLeft   = document.getElementById('margin-left');
+    if (_mTop)    _mTop.addEventListener('change',    (e) => { pageConfig.padding.top    = parseInt(e.target.value) || 0; applyPageStyle(); });
+    if (_mRight)  _mRight.addEventListener('change',  (e) => { pageConfig.padding.right  = parseInt(e.target.value) || 0; applyPageStyle(); });
+    if (_mBottom) _mBottom.addEventListener('change', (e) => { pageConfig.padding.bottom = parseInt(e.target.value) || 0; applyPageStyle(); });
+    if (_mLeft)   _mLeft.addEventListener('change',   (e) => { pageConfig.padding.left   = parseInt(e.target.value) || 0; applyPageStyle(); });
+
+    // ── TOPBAR ACTIONS ──
+    document.getElementById('btn-undo').addEventListener('click',    () => editor.runCommand('core:undo'));
+    document.getElementById('btn-redo').addEventListener('click',    () => editor.runCommand('core:redo'));
+    document.getElementById('btn-preview').addEventListener('click', () => editor.runCommand('core:preview'));
+
+    document.getElementById('btn-export').addEventListener('click', () => {
+      const html = editor.getHtml();
+      const css  = editor.getCss();
+      const blob = new Blob([`<style>${css}</style>${html}`], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'template.html';
+      a.click();
+    });
+
+    // ── BLOCKS ──
+    editor.Blocks.add('heading', {
+      label: 'Heading', category: 'Basic',
+      media: '<svg viewBox="0 0 24 24"><text x="2" y="18" font-size="14" font-weight="bold" fill="currentColor">H</text></svg>',
+      content: '<h1 style="font-size:24px;font-weight:bold;margin:0 0 10px 0;">Your Heading</h1>',
+    });
+    editor.Blocks.add('text', {
+      label: 'Text', category: 'Basic',
+      media: '<svg viewBox="0 0 24 24"><text x="2" y="18" font-size="12" fill="currentColor">T</text></svg>',
+      content: '<p style="font-size:14px;margin:0 0 10px 0;">Your text here...</p>',
+    });
+    editor.Blocks.add('image', {
+      label: 'Image', category: 'Basic',
+      media: '<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+      content: '<img src="https://placehold.co/400x200" style="width:100%;height:auto;display:block;"/>',
+    });
+    editor.Blocks.add('divider', {
+      label: 'Divider', category: 'Basic',
+      media: '<svg viewBox="0 0 24 24"><line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2"/></svg>',
+      content: '<hr style="border:none;border-top:1px solid #ccc;margin:16px 0;"/>',
+    });
+    editor.Blocks.add('spacer', {
+      label: 'Spacer', category: 'Basic',
+      media: '<svg viewBox="0 0 24 24"><line x1="12" y1="4" x2="12" y2="20" stroke="currentColor" stroke-width="2"/></svg>',
+      content: '<div style="height:40px;"></div>',
+    });
+    editor.Blocks.add('1-column', {
+      label: '1 Column', category: 'Layout',
+      media: '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+      content: '<div style="width:100%;padding:10px;box-sizing:border-box;min-height:80px;"></div>',
+    });
+    editor.Blocks.add('2-columns', {
+      label: '2 Cols', category: 'Layout',
+      media: '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="9" height="20" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="13" y="2" width="9" height="20" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+      content: `<div style="display:flex;gap:10px;width:100%;box-sizing:border-box;">
+        <div style="flex:1;min-height:80px;padding:10px;box-sizing:border-box;border:1px dashed #ccc;"></div>
+        <div style="flex:1;min-height:80px;padding:10px;box-sizing:border-box;border:1px dashed #ccc;"></div>
+      </div>`,
+    });
+    editor.Blocks.add('3-columns', {
+      label: '3 Cols', category: 'Layout',
+      media: '<svg viewBox="0 0 24 24"><rect x="1" y="2" width="6" height="20" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="9" y="2" width="6" height="20" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="17" y="2" width="6" height="20" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+      content: `<div style="display:flex;gap:10px;width:100%;box-sizing:border-box;">
+        <div style="flex:1;min-height:80px;padding:10px;box-sizing:border-box;border:1px dashed #ccc;"></div>
+        <div style="flex:1;min-height:80px;padding:10px;box-sizing:border-box;border:1px dashed #ccc;"></div>
+        <div style="flex:1;min-height:80px;padding:10px;box-sizing:border-box;border:1px dashed #ccc;"></div>
+      </div>`,
+    });
+    editor.Blocks.add('2-columns-ratio', {
+      label: '1:2 Col', category: 'Layout',
+      media: '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="6" height="20" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><rect x="10" y="2" width="12" height="20" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+      content: `<div style="display:flex;gap:10px;width:100%;box-sizing:border-box;">
+        <div style="flex:1;min-height:80px;padding:10px;box-sizing:border-box;border:1px dashed #ccc;"></div>
+        <div style="flex:2;min-height:80px;padding:10px;box-sizing:border-box;border:1px dashed #ccc;"></div>
+      </div>`,
+    });
+
+    // ── LOCK / UNLOCK ──
+    editor.Commands.add('lock-component', {
+      run(editor) {
+        const s = editor.getSelected();
+        if (!s) return;
+        s.set({ locked: true, draggable: false, resizable: false, editable: false, removable: false });
+        editor.select(null);
+      }
+    });
+    editor.Commands.add('unlock-component', {
+      run(editor) {
+        const s = editor.getSelected();
+        if (!s) return;
+        s.set({ locked: false, draggable: true, resizable: true, editable: true, removable: true });
+      }
+    });
+    editor.on('component:selected', (component) => {
+      const toolbar = component.get('toolbar');
+      if (toolbar.find(t => t.id === 'lock')) return;
+      toolbar.push(
+        { id: 'lock',   label: '<i class="bi bi-lock-fill"></i>',   command: 'lock-component',   attributes: { title: 'Lock'   } },
+        { id: 'unlock', label: '<i class="bi bi-unlock-fill"></i>', command: 'unlock-component', attributes: { title: 'Unlock' } }
+      );
+      component.set('toolbar', toolbar);
+    });
+
+    // ── RESIZE CONTROLS ──
+    let dimRatioLocked = false;
+    let dimRatio = 1;
+
+    document.getElementById('dim-ratio').addEventListener('change', (e) => {
+      dimRatioLocked = e.target.checked;
+    });
+
+    function parseDimValue(val) {
+      if (!val || val === 'auto') return 'auto';
+      if (val.includes('%') || val.includes('px') || val.includes('em')) return val;
+      return val + 'px';
+    }
+
+    function loadDimensions(component) {
+      if (!component) {
+        ['dim-width','dim-height','dim-x','dim-y'].forEach(id => document.getElementById(id).value = '');
+        return;
+      }
+      const style = component.getStyle();
+      document.getElementById('dim-width').value  = style.width  || '';
+      document.getElementById('dim-height').value = style.height || '';
+      document.getElementById('dim-x').value      = style.left   || '';
+      document.getElementById('dim-y').value      = style.top    || '';
+      const w = parseFloat(style.width);
+      const h = parseFloat(style.height);
+      if (w && h) dimRatio = w / h;
+    }
+
+    function applyDimension(field) {
+      const component = editor.getSelected();
+      if (!component) return;
+      const wInput = document.getElementById('dim-width');
+      const hInput = document.getElementById('dim-height');
+      let w = parseDimValue(wInput.value);
+      let h = parseDimValue(hInput.value);
+      if (dimRatioLocked) {
+        if (field === 'width' && w !== 'auto') {
+          h = (parseFloat(w) / dimRatio).toFixed(1) + 'px';
+          hInput.value = h;
+        } else if (field === 'height' && h !== 'auto') {
+          w = (parseFloat(h) * dimRatio).toFixed(1) + 'px';
+          wInput.value = w;
+        }
+      }
+      const x = parseDimValue(document.getElementById('dim-x').value);
+      const y = parseDimValue(document.getElementById('dim-y').value);
+      const newStyle = {};
+      if (w) newStyle.width  = w;
+      if (h) newStyle.height = h;
+      if (x) newStyle.left   = x;
+      if (y) newStyle.top    = y;
+      component.setStyle({ ...component.getStyle(), ...newStyle });
+    }
+
+    document.getElementById('dim-width').addEventListener('change',  () => applyDimension('width'));
+    document.getElementById('dim-height').addEventListener('change', () => applyDimension('height'));
+    document.getElementById('dim-x').addEventListener('change',      () => applyDimension('x'));
+    document.getElementById('dim-y').addEventListener('change',      () => applyDimension('y'));
+
+    editor.on('component:selected',   (c) => loadDimensions(c));
+    editor.on('component:deselected', ()  => loadDimensions(null));
+
+
+    // ── PLACEHOLDERS ──
+const placeholders = [];
+
+document.getElementById('btn-add-placeholder').addEventListener('click', () => {
+  const input = document.getElementById('placeholder-input');
+  const val = input.value.trim();
+  if (!val) return;
+
+  const key = `{{${val}}}`;
+  if (placeholders.includes(key)) return;
+
+  placeholders.push(key);
+
+  const tag = document.createElement('span');
+  tag.className = 'd-flex align-items-center gap-1 px-2 py-1 rounded';
+  tag.style = `background:var(--bg-item);color:var(--accent2);font-size:11px;cursor:pointer;border:1px solid var(--border);`;
+  tag.innerHTML = `${key} <i class="bi bi-x" style="font-size:11px;"></i>`;
+
+  // Click to insert into selected component
+  tag.addEventListener('click', (e) => {
+    if (e.target.classList.contains('bi-x')) {
+      // Remove placeholder
+      const idx = placeholders.indexOf(key);
+      if (idx > -1) placeholders.splice(idx, 1);
+      tag.remove();
+      return;
+    }
+    // Insert into selected element
+    const selected = editor.getSelected();
+    if (selected) {
+      const current = selected.get('content') || '';
+      selected.set('content', current + key);
+    }
+  });
+
+  document.getElementById('placeholders-list').appendChild(tag);
+  input.value = '';
+});
+
+  </script>
+
+
+
+
+
+
+  <!-- PAGE MARGIN MODAL -->
+<div class="modal fade" id="modal-page-margin" tabindex="-1" aria-labelledby="modalPageMarginLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background:var(--bg-panel);border:1px solid var(--border);color:var(--text);">
+
+      <div class="modal-header" style="border-bottom:1px solid var(--border);">
+        <h6 class="modal-title" id="modalPageMarginLabel">
+          <i class="bi bi-layout-sidebar-inset me-2"></i>Page Margin
+        </h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Presets -->
+        <p style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);" class="mb-2">Presets</p>
+        <div class="d-flex gap-2 mb-3 flex-wrap">
+
+  <button class="margin-preset active-preset" data-preset="narrow"
+    style="background:var(--bg-item);color:var(--text);border:1px solid var(--accent2);
+    border-radius:6px;padding:8px 6px;flex:1;font-size:11px;cursor:pointer;text-align:center;">
+    <div style="font-size:16px;margin-bottom:4px;">▣</div>
+    <div style="font-weight:600;">Narrow</div>
+    <div style="color:var(--text-muted);font-size:10px;">48px</div>
+  </button>
+
+  <button class="margin-preset" data-preset="medium-narrow"
+    style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);
+    border-radius:6px;padding:8px 6px;flex:1;font-size:11px;cursor:pointer;text-align:center;">
+    <div style="font-size:16px;margin-bottom:4px;">▣</div>
+    <div style="font-weight:600;">Med-Narrow</div>
+    <div style="color:var(--text-muted);font-size:10px;">72px</div>
+  </button>
+
+  <button class="margin-preset" data-preset="standard"
+    style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);
+    border-radius:6px;padding:8px 6px;flex:1;font-size:11px;cursor:pointer;text-align:center;">
+    <div style="font-size:16px;margin-bottom:4px;">▣</div>
+    <div style="font-weight:600;">Standard</div>
+    <div style="color:var(--text-muted);font-size:10px;">96px</div>
+  </button>
+
+  <button class="margin-preset" data-preset="moderate"
+    style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);
+    border-radius:6px;padding:8px 6px;flex:1;font-size:11px;cursor:pointer;text-align:center;">
+    <div style="font-size:16px;margin-bottom:4px;">▣</div>
+    <div style="font-weight:600;">Moderate</div>
+    <div style="color:var(--text-muted);font-size:10px;">L/R 120px</div>
+  </button>
+
+  <button class="margin-preset" data-preset="wide"
+    style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);
+    border-radius:6px;padding:8px 6px;flex:1;font-size:11px;cursor:pointer;text-align:center;">
+    <div style="font-size:16px;margin-bottom:4px;">▣</div>
+    <div style="font-weight:600;">Wide</div>
+    <div style="color:var(--text-muted);font-size:10px;">L/R 196px</div>
+  </button>
+
+  <button class="margin-preset" data-preset="custom"
+    style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);
+    border-radius:6px;padding:8px 6px;flex:1;font-size:11px;cursor:pointer;text-align:center;">
+    <div style="font-size:16px;margin-bottom:4px;"><i class="bi bi-sliders"></i></div>
+    <div style="font-weight:600;">Custom</div>
+    <div style="color:var(--text-muted);font-size:10px;">Manual</div>
+  </button>
+
+</div>
+
+        <div id="custom-margin-inputs" style="display:block;">
+          <p style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);" class="mb-2">Values (px)</p>
+
+          <!-- Visual page diagram -->
+          <div style="position:relative;width:120px;height:150px;background:#fff;border:1px solid #ccc;
+            border-radius:4px;margin:0 auto 24px;display:flex;align-items:center;justify-content:center;">
+            <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+              background:var(--bg-panel);font-size:9px;color:var(--accent2);white-space:nowrap;"
+              id="diag-top">Top: 60px</div>
+            <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
+              background:var(--bg-panel);font-size:9px;color:var(--accent2);white-space:nowrap;"
+              id="diag-bottom">Bottom: 60px</div>
+            <div style="position:absolute;left:-28px;top:50%;transform:translateY(-50%);
+              background:var(--bg-panel);font-size:9px;color:var(--accent2);white-space:nowrap;"
+              id="diag-left">Left: 70px</div>
+            <div style="position:absolute;right:-34px;top:50%;transform:translateY(-50%);
+              background:var(--bg-panel);font-size:9px;color:var(--accent2);white-space:nowrap;"
+              id="diag-right">Right: 70px</div>
+            <div style="position:absolute;inset:20px;border:1px dashed rgba(100,149,237,0.5);"></div>
+          </div>
+
+          <div class="row g-2">
+            <div class="col-6">
+              <label style="font-size:11px;color:var(--text-muted);">Top (px)</label>
+              <input type="number" id="margin-top" class="form-control form-control-sm"
+                style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);" value="60"/>
+            </div>
+            <div class="col-6">
+              <label style="font-size:11px;color:var(--text-muted);">Bottom (px)</label>
+              <input type="number" id="margin-bottom" class="form-control form-control-sm"
+                style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);" value="60"/>
+            </div>
+            <div class="col-6">
+              <label style="font-size:11px;color:var(--text-muted);">Left (px)</label>
+              <input type="number" id="margin-left" class="form-control form-control-sm"
+                style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);" value="70"/>
+            </div>
+            <div class="col-6">
+              <label style="font-size:11px;color:var(--text-muted);">Right (px)</label>
+              <input type="number" id="margin-right" class="form-control form-control-sm"
+                style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);" value="70"/>
+            </div>
+          </div>
+
+          <!-- ── APPLY SCOPE TOGGLE ── -->
+          <div class="mt-3 pt-3" style="border-top:1px solid var(--border);">
+            <p style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);" class="mb-2">Apply To</p>
+            <div class="d-flex gap-2">
+
+              <label id="scope-current-label"
+                style="flex:1;display:flex;align-items:center;gap:8px;padding:8px 10px;
+                background:var(--bg-item);border:1px solid var(--accent2);border-radius:6px;
+                cursor:pointer;font-size:12px;color:var(--text);">
+                <input type="radio" name="margin-scope" id="scope-current" value="current" checked
+                  style="accent-color:var(--accent2);width:14px;height:14px;"/>
+                <span>
+                  <i class="bi bi-file-earmark me-1"></i>Current Page
+                </span>
+              </label>
+
+              <label id="scope-all-label"
+                style="flex:1;display:flex;align-items:center;gap:8px;padding:8px 10px;
+                background:var(--bg-item);border:1px solid var(--border);border-radius:6px;
+                cursor:pointer;font-size:12px;color:var(--text);">
+                <input type="radio" name="margin-scope" id="scope-all" value="all"
+                  style="accent-color:var(--accent2);width:14px;height:14px;"/>
+                <span>
+                  <i class="bi bi-files me-1"></i>All Pages
+                </span>
+              </label>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="modal-footer" style="border-top:1px solid var(--border);">
+        <button type="button" class="btn btn-sm" data-bs-dismiss="modal"
+          style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);">Cancel</button>
+        <button type="button" class="btn btn-sm" id="btn-apply-margin"
+          style="background:var(--accent2);color:#000;border:none;">
+          <i class="bi bi-check2"></i> Apply
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+  PAGE BORDER MODAL  (#modal-page-border)
+  ═══════════════════════════════════════════════════════════════
+  WHERE TO ADD THIS IN template_builder.html:
+  ─────────────────────────────────────────────────────────────
+  1. Find the LAST </div> before </body></html>
+     (it is the closing tag of the #modal-page-margin element, line ~1334)
+  2. Paste this ENTIRE block AFTER that </div>
+     and BEFORE </body>
+  3. Then also add the script line (given at the very bottom of this file)
+     right after:  <script src="page-style-margin.js"></script>
+  ═══════════════════════════════════════════════════════════════ -->
+
+
+<div class="modal fade" id="modal-page-border" tabindex="-1"
+  aria-labelledby="modalPageBorderLabel" aria-hidden="true">
+
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content"
+      style="background:var(--bg-panel);border:1px solid var(--border);color:var(--text);">
+
+      <!-- ── HEADER ── -->
+      <div class="modal-header" style="border-bottom:1px solid var(--border);padding:12px 16px;">
+        <h6 class="modal-title mb-0" id="modalPageBorderLabel">
+          <i class="bi bi-border-outer me-2"></i>Page Border
+        </h6>
+        <button type="button" class="btn-close btn-close-white"
+          data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════
+           MODAL BODY
+           ══════════════════════════════════════════════════════ -->
+      <div class="modal-body" style="padding:16px;">
+
+        <div class="row g-3">
+
+          <!-- ╔══════════════════════════════════════════════╗
+               ║  LEFT COLUMN  (Design + Weight + Style)     ║
+               ╚══════════════════════════════════════════════╝ -->
+          <div class="col-12 col-md-7">
+
+            <!-- ──────────────────────────────────────────────
+                 PART A: BORDER DESIGN
+                 5 buttons: Left / Right / Top / Bottom / All
+                 Each shows a mini page icon + label.
+                 data-design must match SECTION 3 in the JS.
+                 ────────────────────────────────────────────── -->
+            <p class="mb-2"
+              style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+                     color:var(--text-muted);font-weight:600;">
+              Border Design
+            </p>
+
+            <div class="d-flex gap-2 mb-3 flex-wrap">
+
+              <!-- Left Border -->
+              <button class="border-design-btn" data-design="left"
+                style="background:var(--bg-item);color:var(--text);border:1px solid var(--accent2);
+                       border-radius:6px;padding:8px 6px;flex:1;min-width:54px;font-size:11px;
+                       cursor:pointer;text-align:center;transition:all .15s;">
+                <div style="width:28px;height:36px;background:#fff;border-left:3px solid currentColor;
+                            border-top:1px solid #ddd;border-right:1px solid #ddd;border-bottom:1px solid #ddd;
+                            margin:0 auto 5px;border-radius:2px;"></div>
+                <div style="font-weight:600;font-size:10px;">Left</div>
+              </button>
+
+              <!-- Right Border -->
+              <button class="border-design-btn" data-design="right"
+                style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);
+                       border-radius:6px;padding:8px 6px;flex:1;min-width:54px;font-size:11px;
+                       cursor:pointer;text-align:center;transition:all .15s;">
+                <div style="width:28px;height:36px;background:#fff;border-right:3px solid currentColor;
+                            border-top:1px solid #ddd;border-left:1px solid #ddd;border-bottom:1px solid #ddd;
+                            margin:0 auto 5px;border-radius:2px;"></div>
+                <div style="font-weight:600;font-size:10px;">Right</div>
+              </button>
+
+              <!-- Top Border -->
+              <button class="border-design-btn" data-design="top"
+                style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);
+                       border-radius:6px;padding:8px 6px;flex:1;min-width:54px;font-size:11px;
+                       cursor:pointer;text-align:center;transition:all .15s;">
+                <div style="width:28px;height:36px;background:#fff;border-top:3px solid currentColor;
+                            border-left:1px solid #ddd;border-right:1px solid #ddd;border-bottom:1px solid #ddd;
+                            margin:0 auto 5px;border-radius:2px;"></div>
+                <div style="font-weight:600;font-size:10px;">Top</div>
+              </button>
+
+              <!-- Bottom Border -->
+              <button class="border-design-btn" data-design="bottom"
+                style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);
+                       border-radius:6px;padding:8px 6px;flex:1;min-width:54px;font-size:11px;
+                       cursor:pointer;text-align:center;transition:all .15s;">
+                <div style="width:28px;height:36px;background:#fff;border-bottom:3px solid currentColor;
+                            border-top:1px solid #ddd;border-left:1px solid #ddd;border-right:1px solid #ddd;
+                            margin:0 auto 5px;border-radius:2px;"></div>
+                <div style="font-weight:600;font-size:10px;">Bottom</div>
+              </button>
+
+              <!-- All Borders -->
+              <button class="border-design-btn" data-design="all"
+                style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);
+                       border-radius:6px;padding:8px 6px;flex:1;min-width:54px;font-size:11px;
+                       cursor:pointer;text-align:center;transition:all .15s;">
+                <div style="width:28px;height:36px;background:#fff;border:3px solid currentColor;
+                            margin:0 auto 5px;border-radius:2px;"></div>
+                <div style="font-weight:600;font-size:10px;">All</div>
+              </button>
+
+            </div>
+
+
+            <!-- ──────────────────────────────────────────────
+                 PART B: BORDER WEIGHT
+                 Pixel sizes: 1 2 3 4 6 8 10 12 16
+                 data-weight must be a string matching
+                 SECTION 1 borderConfig.weight values.
+                 ────────────────────────────────────────────── -->
+            <p class="mb-2"
+              style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+                     color:var(--text-muted);font-weight:600;">
+              Border Weight
+            </p>
+
+            <div class="d-flex flex-wrap gap-1 mb-3">
+
+              <button class="border-weight-btn" data-weight="1"
+                style="background:rgba(78,205,196,0.12);color:var(--accent2);
+                       border:1px solid var(--accent2);border-radius:4px;
+                       padding:4px 8px;font-size:11px;cursor:pointer;transition:all .15s;">
+                1px
+              </button>
+
+              <button class="border-weight-btn" data-weight="2"
+                style="background:var(--bg-item);color:var(--text-muted);
+                       border:1px solid var(--border);border-radius:4px;
+                       padding:4px 8px;font-size:11px;cursor:pointer;transition:all .15s;">
+                2px
+              </button>
+
+              <button class="border-weight-btn" data-weight="3"
+                style="background:var(--bg-item);color:var(--text-muted);
+                       border:1px solid var(--border);border-radius:4px;
+                       padding:4px 8px;font-size:11px;cursor:pointer;transition:all .15s;">
+                3px
+              </button>
+
+              <button class="border-weight-btn" data-weight="4"
+                style="background:var(--bg-item);color:var(--text-muted);
+                       border:1px solid var(--border);border-radius:4px;
+                       padding:4px 8px;font-size:11px;cursor:pointer;transition:all .15s;">
+                4px
+              </button>
+
+              <button class="border-weight-btn" data-weight="6"
+                style="background:var(--bg-item);color:var(--text-muted);
+                       border:1px solid var(--border);border-radius:4px;
+                       padding:4px 8px;font-size:11px;cursor:pointer;transition:all .15s;">
+                6px
+              </button>
+
+              <button class="border-weight-btn" data-weight="8"
+                style="background:var(--bg-item);color:var(--text-muted);
+                       border:1px solid var(--border);border-radius:4px;
+                       padding:4px 8px;font-size:11px;cursor:pointer;transition:all .15s;">
+                8px
+              </button>
+
+              <button class="border-weight-btn" data-weight="10"
+                style="background:var(--bg-item);color:var(--text-muted);
+                       border:1px solid var(--border);border-radius:4px;
+                       padding:4px 8px;font-size:11px;cursor:pointer;transition:all .15s;">
+                10px
+              </button>
+
+              <button class="border-weight-btn" data-weight="12"
+                style="background:var(--bg-item);color:var(--text-muted);
+                       border:1px solid var(--border);border-radius:4px;
+                       padding:4px 8px;font-size:11px;cursor:pointer;transition:all .15s;">
+                12px
+              </button>
+
+              <button class="border-weight-btn" data-weight="16"
+                style="background:var(--bg-item);color:var(--text-muted);
+                       border:1px solid var(--border);border-radius:4px;
+                       padding:4px 8px;font-size:11px;cursor:pointer;transition:all .15s;">
+                16px
+              </button>
+
+            </div>
+
+
+            <!-- ──────────────────────────────────────────────
+                 PART C: BORDER STYLE
+                 Solid / Dashed / Dotted / Double
+                 Each button shows a line preview.
+                 data-style must match CSS border-style values.
+                 ────────────────────────────────────────────── -->
+            <p class="mb-2"
+              style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+                     color:var(--text-muted);font-weight:600;">
+              Border Style
+            </p>
+
+            <div class="d-flex gap-2 mb-1 flex-wrap">
+
+              <!-- Solid -->
+              <button class="border-style-btn" data-style="solid"
+                style="background:rgba(78,205,196,0.12);color:var(--accent2);
+                       border:1px solid var(--accent2);border-radius:6px;
+                       padding:8px 10px;flex:1;font-size:11px;cursor:pointer;
+                       text-align:center;transition:all .15s;">
+                <div style="width:100%;height:3px;background:currentColor;margin-bottom:5px;
+                            border-radius:2px;"></div>
+                <span style="font-weight:600;">Solid</span>
+              </button>
+
+              <!-- Dashed -->
+              <button class="border-style-btn" data-style="dashed"
+                style="background:var(--bg-item);color:var(--text-muted);
+                       border:1px solid var(--border);border-radius:6px;
+                       padding:8px 10px;flex:1;font-size:11px;cursor:pointer;
+                       text-align:center;transition:all .15s;">
+                <div style="width:100%;height:0;border-top:3px dashed currentColor;
+                            margin-bottom:8px;"></div>
+                <span style="font-weight:600;">Dashed</span>
+              </button>
+
+              <!-- Dotted -->
+              <button class="border-style-btn" data-style="dotted"
+                style="background:var(--bg-item);color:var(--text-muted);
+                       border:1px solid var(--border);border-radius:6px;
+                       padding:8px 10px;flex:1;font-size:11px;cursor:pointer;
+                       text-align:center;transition:all .15s;">
+                <div style="width:100%;height:0;border-top:3px dotted currentColor;
+                            margin-bottom:8px;"></div>
+                <span style="font-weight:600;">Dotted</span>
+              </button>
+
+              <!-- Double -->
+              <button class="border-style-btn" data-style="double"
+                style="background:var(--bg-item);color:var(--text-muted);
+                       border:1px solid var(--border);border-radius:6px;
+                       padding:8px 10px;flex:1;font-size:11px;cursor:pointer;
+                       text-align:center;transition:all .15s;">
+                <div style="width:100%;height:0;border-top:4px double currentColor;
+                            margin-bottom:7px;"></div>
+                <span style="font-weight:600;">Double</span>
+              </button>
+
+            </div>
+
+          </div><!-- /col left -->
+
+
+          <!-- ╔══════════════════════════════════════════════╗
+               ║  RIGHT COLUMN  (Live Preview + Apply To)    ║
+               ╚══════════════════════════════════════════════╝ -->
+          <div class="col-12 col-md-5">
+
+            <!-- ──────────────────────────────────────────────
+                 PART D: LIVE PREVIEW
+                 A small A4-shaped white box that reflects the
+                 current design/weight/style/color in real time.
+                 Updated by updateBorderPreview() in the JS.
+                 ────────────────────────────────────────────── -->
+            <p class="mb-2"
+              style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+                     color:var(--text-muted);font-weight:600;">
+              Live Preview
+            </p>
+
+            <div style="display:flex;align-items:center;justify-content:center;
+                        background:var(--bg-dark);border-radius:6px;
+                        padding:16px;margin-bottom:16px;min-height:110px;">
+              <!-- id="border-live-preview" is updated by Section 13 JS -->
+              <div id="border-live-preview"
+                style="width:70px;height:90px;background:#fff;border-radius:2px;
+                       box-shadow:0 2px 8px rgba(0,0,0,0.3);
+                       border:1px solid #000;
+                       transition:border .2s ease;"></div>
+            </div>
+
+
+            <!-- ──────────────────────────────────────────────
+                 PART E: APPLY TO SCOPE
+                 4 options — Default is "Current Page".
+                 Each label has data-scope which must match
+                 borderConfig.scope values in the JS.
+                 ────────────────────────────────────────────── -->
+            <p class="mb-2"
+              style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+                     color:var(--text-muted);font-weight:600;">
+              Apply To
+            </p>
+
+            <div class="d-flex flex-column gap-2">
+
+              <!-- Current Page (default) -->
+              <label class="border-scope-label" data-scope="current"
+                style="display:flex;align-items:center;gap:8px;padding:7px 10px;
+                       background:var(--bg-item);border:1px solid var(--accent2);
+                       border-radius:6px;cursor:pointer;font-size:12px;color:var(--text);">
+                <input type="radio" name="border-scope" id="border-scope-current"
+                  value="current" checked
+                  style="accent-color:var(--accent2);width:14px;height:14px;"/>
+                <i class="bi bi-file-earmark me-1" style="font-size:13px;"></i>
+                Current Page
+              </label>
+
+              <!-- First Page Only -->
+              <label class="border-scope-label" data-scope="first"
+                style="display:flex;align-items:center;gap:8px;padding:7px 10px;
+                       background:var(--bg-item);border:1px solid var(--border);
+                       border-radius:6px;cursor:pointer;font-size:12px;color:var(--text);">
+                <input type="radio" name="border-scope" id="border-scope-first"
+                  value="first"
+                  style="accent-color:var(--accent2);width:14px;height:14px;"/>
+                <i class="bi bi-file-earmark-check me-1" style="font-size:13px;"></i>
+                First Page Only
+              </label>
+
+              <!-- All Pages Except First -->
+              <label class="border-scope-label" data-scope="except-first"
+                style="display:flex;align-items:center;gap:8px;padding:7px 10px;
+                       background:var(--bg-item);border:1px solid var(--border);
+                       border-radius:6px;cursor:pointer;font-size:12px;color:var(--text);">
+                <input type="radio" name="border-scope" id="border-scope-except"
+                  value="except-first"
+                  style="accent-color:var(--accent2);width:14px;height:14px;"/>
+                <i class="bi bi-files me-1" style="font-size:13px;"></i>
+                All Except First
+              </label>
+
+              <!-- All Pages -->
+              <label class="border-scope-label" data-scope="all"
+                style="display:flex;align-items:center;gap:8px;padding:7px 10px;
+                       background:var(--bg-item);border:1px solid var(--border);
+                       border-radius:6px;cursor:pointer;font-size:12px;color:var(--text);">
+                <input type="radio" name="border-scope" id="border-scope-all"
+                  value="all"
+                  style="accent-color:var(--accent2);width:14px;height:14px;"/>
+                <i class="bi bi-stickies me-1" style="font-size:13px;"></i>
+                All Pages
+              </label>
+
+            </div>
+
+          </div><!-- /col right -->
+
+        </div><!-- /row -->
+
+
+        <!-- ════════════════════════════════════════════════════
+             PART F: BORDER COLOR
+             Full-width section below the two-column area.
+             Palette grid  8 cols × 6 rows = 48 theme swatches.
+             Standard Colors row: 8 vivid swatches.
+             Hex input + More Colors native picker at bottom.
+             ════════════════════════════════════════════════════ -->
+        <div class="mt-3 pt-3" style="border-top:1px solid var(--border);">
+
+          <p class="mb-2"
+            style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+                   color:var(--text-muted);font-weight:600;">
+            Border Color
+          </p>
+
+          <!-- ── Theme Colors grid ──
+               8 columns × 6 rows.
+               Columns (left→right): White/Black | Warm-Gray | Red | Orange | Gold | Green | Teal | Blue
+               Rows (top→bottom): lightest → darkest -->
+          <div style="display:grid;grid-template-columns:repeat(8,1fr);
+                      gap:3px;margin-bottom:8px;">
+
+            <!-- ROW 1 — Lightest Tints -->
+            <div class="border-color-swatch" data-color="#FFFFFF"
+              style="width:100%;aspect-ratio:1;background:#FFFFFF;border-radius:3px;
+                     cursor:pointer;border:1px solid rgba(255,255,255,0.3);"
+              title="#FFFFFF"></div>
+            <div class="border-color-swatch" data-color="#F5F5F5"
+              style="width:100%;aspect-ratio:1;background:#F5F5F5;border-radius:3px;
+                     cursor:pointer;border:1px solid rgba(0,0,0,0.1);"
+              title="#F5F5F5"></div>
+            <div class="border-color-swatch" data-color="#FFEBEE"
+              style="width:100%;aspect-ratio:1;background:#FFEBEE;border-radius:3px;
+                     cursor:pointer;" title="#FFEBEE"></div>
+            <div class="border-color-swatch" data-color="#FFF3E0"
+              style="width:100%;aspect-ratio:1;background:#FFF3E0;border-radius:3px;
+                     cursor:pointer;" title="#FFF3E0"></div>
+            <div class="border-color-swatch" data-color="#FFFDE7"
+              style="width:100%;aspect-ratio:1;background:#FFFDE7;border-radius:3px;
+                     cursor:pointer;" title="#FFFDE7"></div>
+            <div class="border-color-swatch" data-color="#E8F5E9"
+              style="width:100%;aspect-ratio:1;background:#E8F5E9;border-radius:3px;
+                     cursor:pointer;" title="#E8F5E9"></div>
+            <div class="border-color-swatch" data-color="#E0F7FA"
+              style="width:100%;aspect-ratio:1;background:#E0F7FA;border-radius:3px;
+                     cursor:pointer;" title="#E0F7FA"></div>
+            <div class="border-color-swatch" data-color="#E8EAF6"
+              style="width:100%;aspect-ratio:1;background:#E8EAF6;border-radius:3px;
+                     cursor:pointer;" title="#E8EAF6"></div>
+
+            <!-- ROW 2 -->
+            <div class="border-color-swatch" data-color="#E0E0E0"
+              style="width:100%;aspect-ratio:1;background:#E0E0E0;border-radius:3px;
+                     cursor:pointer;" title="#E0E0E0"></div>
+            <div class="border-color-swatch" data-color="#BDBDBD"
+              style="width:100%;aspect-ratio:1;background:#BDBDBD;border-radius:3px;
+                     cursor:pointer;" title="#BDBDBD"></div>
+            <div class="border-color-swatch" data-color="#FFCDD2"
+              style="width:100%;aspect-ratio:1;background:#FFCDD2;border-radius:3px;
+                     cursor:pointer;" title="#FFCDD2"></div>
+            <div class="border-color-swatch" data-color="#FFE0B2"
+              style="width:100%;aspect-ratio:1;background:#FFE0B2;border-radius:3px;
+                     cursor:pointer;" title="#FFE0B2"></div>
+            <div class="border-color-swatch" data-color="#FFF9C4"
+              style="width:100%;aspect-ratio:1;background:#FFF9C4;border-radius:3px;
+                     cursor:pointer;" title="#FFF9C4"></div>
+            <div class="border-color-swatch" data-color="#C8E6C9"
+              style="width:100%;aspect-ratio:1;background:#C8E6C9;border-radius:3px;
+                     cursor:pointer;" title="#C8E6C9"></div>
+            <div class="border-color-swatch" data-color="#B2EBF2"
+              style="width:100%;aspect-ratio:1;background:#B2EBF2;border-radius:3px;
+                     cursor:pointer;" title="#B2EBF2"></div>
+            <div class="border-color-swatch" data-color="#C5CAE9"
+              style="width:100%;aspect-ratio:1;background:#C5CAE9;border-radius:3px;
+                     cursor:pointer;" title="#C5CAE9"></div>
+
+            <!-- ROW 3 -->
+            <div class="border-color-swatch" data-color="#9E9E9E"
+              style="width:100%;aspect-ratio:1;background:#9E9E9E;border-radius:3px;
+                     cursor:pointer;" title="#9E9E9E"></div>
+            <div class="border-color-swatch" data-color="#757575"
+              style="width:100%;aspect-ratio:1;background:#757575;border-radius:3px;
+                     cursor:pointer;" title="#757575"></div>
+            <div class="border-color-swatch" data-color="#EF9A9A"
+              style="width:100%;aspect-ratio:1;background:#EF9A9A;border-radius:3px;
+                     cursor:pointer;" title="#EF9A9A"></div>
+            <div class="border-color-swatch" data-color="#FFCC80"
+              style="width:100%;aspect-ratio:1;background:#FFCC80;border-radius:3px;
+                     cursor:pointer;" title="#FFCC80"></div>
+            <div class="border-color-swatch" data-color="#FFF176"
+              style="width:100%;aspect-ratio:1;background:#FFF176;border-radius:3px;
+                     cursor:pointer;" title="#FFF176"></div>
+            <div class="border-color-swatch" data-color="#A5D6A7"
+              style="width:100%;aspect-ratio:1;background:#A5D6A7;border-radius:3px;
+                     cursor:pointer;" title="#A5D6A7"></div>
+            <div class="border-color-swatch" data-color="#80DEEA"
+              style="width:100%;aspect-ratio:1;background:#80DEEA;border-radius:3px;
+                     cursor:pointer;" title="#80DEEA"></div>
+            <div class="border-color-swatch" data-color="#9FA8DA"
+              style="width:100%;aspect-ratio:1;background:#9FA8DA;border-radius:3px;
+                     cursor:pointer;" title="#9FA8DA"></div>
+
+            <!-- ROW 4 -->
+            <div class="border-color-swatch" data-color="#616161"
+              style="width:100%;aspect-ratio:1;background:#616161;border-radius:3px;
+                     cursor:pointer;" title="#616161"></div>
+            <div class="border-color-swatch" data-color="#424242"
+              style="width:100%;aspect-ratio:1;background:#424242;border-radius:3px;
+                     cursor:pointer;" title="#424242"></div>
+            <div class="border-color-swatch" data-color="#E53935"
+              style="width:100%;aspect-ratio:1;background:#E53935;border-radius:3px;
+                     cursor:pointer;" title="#E53935"></div>
+            <div class="border-color-swatch" data-color="#FB8C00"
+              style="width:100%;aspect-ratio:1;background:#FB8C00;border-radius:3px;
+                     cursor:pointer;" title="#FB8C00"></div>
+            <div class="border-color-swatch" data-color="#FDD835"
+              style="width:100%;aspect-ratio:1;background:#FDD835;border-radius:3px;
+                     cursor:pointer;" title="#FDD835"></div>
+            <div class="border-color-swatch" data-color="#43A047"
+              style="width:100%;aspect-ratio:1;background:#43A047;border-radius:3px;
+                     cursor:pointer;" title="#43A047"></div>
+            <div class="border-color-swatch" data-color="#00ACC1"
+              style="width:100%;aspect-ratio:1;background:#00ACC1;border-radius:3px;
+                     cursor:pointer;" title="#00ACC1"></div>
+            <div class="border-color-swatch" data-color="#5C6BC0"
+              style="width:100%;aspect-ratio:1;background:#5C6BC0;border-radius:3px;
+                     cursor:pointer;" title="#5C6BC0"></div>
+
+            <!-- ROW 5 -->
+            <div class="border-color-swatch" data-color="#212121"
+              style="width:100%;aspect-ratio:1;background:#212121;border-radius:3px;
+                     cursor:pointer;" title="#212121"></div>
+            <div class="border-color-swatch" data-color="#1A1A1A"
+              style="width:100%;aspect-ratio:1;background:#1A1A1A;border-radius:3px;
+                     cursor:pointer;" title="#1A1A1A"></div>
+            <div class="border-color-swatch" data-color="#C62828"
+              style="width:100%;aspect-ratio:1;background:#C62828;border-radius:3px;
+                     cursor:pointer;" title="#C62828"></div>
+            <div class="border-color-swatch" data-color="#E65100"
+              style="width:100%;aspect-ratio:1;background:#E65100;border-radius:3px;
+                     cursor:pointer;" title="#E65100"></div>
+            <div class="border-color-swatch" data-color="#F9A825"
+              style="width:100%;aspect-ratio:1;background:#F9A825;border-radius:3px;
+                     cursor:pointer;" title="#F9A825"></div>
+            <div class="border-color-swatch" data-color="#2E7D32"
+              style="width:100%;aspect-ratio:1;background:#2E7D32;border-radius:3px;
+                     cursor:pointer;" title="#2E7D32"></div>
+            <div class="border-color-swatch" data-color="#00838F"
+              style="width:100%;aspect-ratio:1;background:#00838F;border-radius:3px;
+                     cursor:pointer;" title="#00838F"></div>
+            <div class="border-color-swatch" data-color="#3949AB"
+              style="width:100%;aspect-ratio:1;background:#3949AB;border-radius:3px;
+                     cursor:pointer;" title="#3949AB"></div>
+
+            <!-- ROW 6 — Darkest -->
+            <div class="border-color-swatch" data-color="#000000"
+              style="width:100%;aspect-ratio:1;background:#000000;border-radius:3px;
+                     cursor:pointer;border:1px solid var(--border);" title="#000000"></div>
+            <div class="border-color-swatch" data-color="#111827"
+              style="width:100%;aspect-ratio:1;background:#111827;border-radius:3px;
+                     cursor:pointer;" title="#111827"></div>
+            <div class="border-color-swatch" data-color="#7F0000"
+              style="width:100%;aspect-ratio:1;background:#7F0000;border-radius:3px;
+                     cursor:pointer;" title="#7F0000"></div>
+            <div class="border-color-swatch" data-color="#7A2900"
+              style="width:100%;aspect-ratio:1;background:#7A2900;border-radius:3px;
+                     cursor:pointer;" title="#7A2900"></div>
+            <div class="border-color-swatch" data-color="#795548"
+              style="width:100%;aspect-ratio:1;background:#795548;border-radius:3px;
+                     cursor:pointer;" title="#795548"></div>
+            <div class="border-color-swatch" data-color="#1B5E20"
+              style="width:100%;aspect-ratio:1;background:#1B5E20;border-radius:3px;
+                     cursor:pointer;" title="#1B5E20"></div>
+            <div class="border-color-swatch" data-color="#006064"
+              style="width:100%;aspect-ratio:1;background:#006064;border-radius:3px;
+                     cursor:pointer;" title="#006064"></div>
+            <div class="border-color-swatch" data-color="#1A237E"
+              style="width:100%;aspect-ratio:1;background:#1A237E;border-radius:3px;
+                     cursor:pointer;" title="#1A237E"></div>
+
+          </div><!-- /theme grid -->
+
+          <!-- ── Standard Colors label ── -->
+          <p class="mb-1 mt-3"
+            style="font-size:10px;font-weight:700;color:var(--text);letter-spacing:0.5px;">
+            Standard Colors
+          </p>
+
+          <!-- ── Standard Colors row (8 vivid swatches) ── -->
+          <div style="display:flex;gap:3px;margin-bottom:10px;">
+
+            <div class="border-color-swatch" data-color="#FF0000"
+              style="width:24px;height:24px;background:#FF0000;border-radius:3px;
+                     cursor:pointer;flex-shrink:0;" title="Red #FF0000"></div>
+            <div class="border-color-swatch" data-color="#FF6D00"
+              style="width:24px;height:24px;background:#FF6D00;border-radius:3px;
+                     cursor:pointer;flex-shrink:0;" title="Orange #FF6D00"></div>
+            <div class="border-color-swatch" data-color="#FFD600"
+              style="width:24px;height:24px;background:#FFD600;border-radius:3px;
+                     cursor:pointer;flex-shrink:0;" title="Yellow #FFD600"></div>
+            <div class="border-color-swatch" data-color="#00C853"
+              style="width:24px;height:24px;background:#00C853;border-radius:3px;
+                     cursor:pointer;flex-shrink:0;" title="Green #00C853"></div>
+            <div class="border-color-swatch" data-color="#00BCD4"
+              style="width:24px;height:24px;background:#00BCD4;border-radius:3px;
+                     cursor:pointer;flex-shrink:0;" title="Cyan #00BCD4"></div>
+            <div class="border-color-swatch" data-color="#2979FF"
+              style="width:24px;height:24px;background:#2979FF;border-radius:3px;
+                     cursor:pointer;flex-shrink:0;" title="Blue #2979FF"></div>
+            <div class="border-color-swatch" data-color="#D500F9"
+              style="width:24px;height:24px;background:#D500F9;border-radius:3px;
+                     cursor:pointer;flex-shrink:0;" title="Purple #D500F9"></div>
+            <div class="border-color-swatch" data-color="#FF1744"
+              style="width:24px;height:24px;background:#FF1744;border-radius:3px;
+                     cursor:pointer;flex-shrink:0;" title="Rose #FF1744"></div>
+
+          </div><!-- /standard colors -->
+
+          <!-- ── More Colors row: hex input + native color picker ── -->
+          <div class="d-flex align-items-center gap-2 mt-1">
+
+            <!-- Color circle icon (opens native picker) -->
+            <label for="border-color-picker"
+              style="display:flex;align-items:center;gap:5px;cursor:pointer;
+                     font-size:11px;color:var(--text-muted);">
+              <!-- The actual picker input is visually hidden; the label triggers it -->
+              <input type="color" id="border-color-picker" value="#000000"
+                style="width:0;height:0;opacity:0;position:absolute;pointer-events:none;"/>
+              <i class="bi bi-circle-half" style="font-size:15px;color:var(--accent2);"></i>
+              <span>More Colors</span>
+            </label>
+
+            <!-- Hex text input -->
+            <div class="input-group input-group-sm" style="max-width:160px;">
+              <span class="input-group-text"
+                style="background:var(--bg-item);border:1px solid var(--border);
+                       color:var(--text-muted);font-size:11px;padding:3px 8px;">
+                #
+              </span>
+              <input type="text" id="border-color-hex"
+                class="form-control form-control-sm"
+                placeholder="000000" maxlength="7"
+                style="background:var(--bg-item);color:var(--text);
+                       border:1px solid var(--border);font-size:11px;
+                       font-family:monospace;"/>
+            </div>
+
+            <!-- Color preview chip — shows selected color live -->
+            <div id="border-hex-preview-chip"
+              style="width:24px;height:24px;border-radius:4px;
+                     background:#000000;border:1px solid var(--border);
+                     flex-shrink:0;transition:background .15s;">
+            </div>
+
+          </div><!-- /more colors row -->
+
+        </div><!-- /Part F: Border Color section -->
+
+      </div><!-- /modal-body -->
+
+
+
+
+      
+
+
+      <!-- ── FOOTER ── -->
+      <div class="modal-footer"
+        style="border-top:1px solid var(--border);
+               justify-content:space-between;padding:10px 16px;">
+
+        <!-- Left: Remove actions -->
+        <div class="d-flex gap-2">
+          <button type="button" id="btn-remove-border"
+            class="btn btn-sm"
+            style="background:transparent;color:var(--accent);
+                   border:1px solid var(--accent);font-size:12px;">
+            <i class="bi bi-trash3 me-1"></i>Remove Border
+          </button>
+          <button type="button" id="btn-remove-border-current"
+            class="btn btn-sm"
+            style="background:transparent;color:var(--text-muted);
+                   border:1px solid var(--border);font-size:12px;">
+            <i class="bi bi-file-earmark-x me-1"></i>Remove Current Page
+          </button>
+        </div>
+
+        <!-- Right: Cancel + Apply -->
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm" data-bs-dismiss="modal"
+            style="background:var(--bg-item);color:var(--text);
+                   border:1px solid var(--border);font-size:12px;">
+            Cancel
+          </button>
+          <button type="button" id="btn-apply-border"
+            class="btn btn-sm"
+            style="background:var(--accent2);color:#000;border:none;font-size:12px;">
+            <i class="bi bi-check2 me-1"></i>Apply
+          </button>
+        </div>
+
+      </div><!-- /modal-footer -->
+
+    </div><!-- /modal-content -->
+  </div><!-- /modal-dialog -->
+</div><!-- /modal-page-border -->
+
+
+
+
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+  PAGE COLOR MODAL  (#modal-page-background)
+  ─────────────────────────────────────────────────────────────
+  WHERE TO ADD:
+  Find the line:   <script src="leftpanel.js"></script>
+  Paste THIS ENTIRE BLOCK directly ABOVE that line.
+  ═══════════════════════════════════════════════════════════════ -->
+
+<div class="modal fade" id="modal-page-background" tabindex="-1"
+  aria-labelledby="modalPageBackgroundLabel" aria-hidden="true">
+
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content"
+      style="background:var(--bg-panel);border:1px solid var(--border);color:var(--text);">
+
+      <!-- ── HEADER ── -->
+      <div class="modal-header" style="border-bottom:1px solid var(--border);padding:12px 16px;">
+        <h6 class="modal-title mb-0" id="modalPageBackgroundLabel">
+          <i class="bi bi-palette2 me-2"></i>Page Color
+        </h6>
+        <button type="button" class="btn-close btn-close-white"
+          data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- ── BODY ── -->
+      <div class="modal-body" style="padding:16px;">
+
+        <!-- ── LIVE PREVIEW ── -->
+        <p class="mb-2"
+          style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+                 color:var(--text-muted);font-weight:600;">
+          Preview
+        </p>
+        <div style="display:flex;align-items:center;justify-content:center;
+                    background:var(--bg-dark);border-radius:6px;
+                    padding:12px;margin-bottom:16px;min-height:90px;">
+          <div id="pgbg-live-preview"
+            style="width:60px;height:78px;background:#ffffff;border-radius:2px;
+                   box-shadow:0 2px 8px rgba(0,0,0,0.4);
+                   border:1px solid rgba(128,128,128,0.4);
+                   transition:background .2s ease;">
+          </div>
+        </div>
+
+
+        <!-- ── NO COLOR BUTTON ── -->
+        <button id="pgbg-no-color-btn" class="selected">
+          <div class="pgbg-no-color-chip"></div>
+          <span>No Color <span style="color:var(--text-muted);font-size:10px;">(Default)</span></span>
+        </button>
+
+
+        <!-- ── THEME COLOR GRID (8 × 6) ── -->
+        <p class="mb-1 mt-2"
+          style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+                 color:var(--text-muted);font-weight:600;">
+          Theme Colors
+        </p>
+
+        <div class="pgbg-grid">
+
+          <!-- ROW 1 — Lightest -->
+          <div class="pgbg-swatch" data-color="#FFFFFF" style="background:#FFFFFF;border:1px solid rgba(0,0,0,0.12);" title="#FFFFFF"></div>
+          <div class="pgbg-swatch" data-color="#F5F5F5" style="background:#F5F5F5;border:1px solid rgba(0,0,0,0.1);"  title="#F5F5F5"></div>
+          <div class="pgbg-swatch" data-color="#FFEBEE" style="background:#FFEBEE;" title="#FFEBEE"></div>
+          <div class="pgbg-swatch" data-color="#FFF3E0" style="background:#FFF3E0;" title="#FFF3E0"></div>
+          <div class="pgbg-swatch" data-color="#FFFDE7" style="background:#FFFDE7;" title="#FFFDE7"></div>
+          <div class="pgbg-swatch" data-color="#E8F5E9" style="background:#E8F5E9;" title="#E8F5E9"></div>
+          <div class="pgbg-swatch" data-color="#E0F7FA" style="background:#E0F7FA;" title="#E0F7FA"></div>
+          <div class="pgbg-swatch" data-color="#E8EAF6" style="background:#E8EAF6;" title="#E8EAF6"></div>
+
+          <!-- ROW 2 -->
+          <div class="pgbg-swatch" data-color="#E0E0E0" style="background:#E0E0E0;" title="#E0E0E0"></div>
+          <div class="pgbg-swatch" data-color="#BDBDBD" style="background:#BDBDBD;" title="#BDBDBD"></div>
+          <div class="pgbg-swatch" data-color="#FFCDD2" style="background:#FFCDD2;" title="#FFCDD2"></div>
+          <div class="pgbg-swatch" data-color="#FFE0B2" style="background:#FFE0B2;" title="#FFE0B2"></div>
+          <div class="pgbg-swatch" data-color="#FFF9C4" style="background:#FFF9C4;" title="#FFF9C4"></div>
+          <div class="pgbg-swatch" data-color="#C8E6C9" style="background:#C8E6C9;" title="#C8E6C9"></div>
+          <div class="pgbg-swatch" data-color="#B2EBF2" style="background:#B2EBF2;" title="#B2EBF2"></div>
+          <div class="pgbg-swatch" data-color="#C5CAE9" style="background:#C5CAE9;" title="#C5CAE9"></div>
+
+          <!-- ROW 3 -->
+          <div class="pgbg-swatch" data-color="#9E9E9E" style="background:#9E9E9E;" title="#9E9E9E"></div>
+          <div class="pgbg-swatch" data-color="#757575" style="background:#757575;" title="#757575"></div>
+          <div class="pgbg-swatch" data-color="#EF9A9A" style="background:#EF9A9A;" title="#EF9A9A"></div>
+          <div class="pgbg-swatch" data-color="#FFCC80" style="background:#FFCC80;" title="#FFCC80"></div>
+          <div class="pgbg-swatch" data-color="#FFF176" style="background:#FFF176;" title="#FFF176"></div>
+          <div class="pgbg-swatch" data-color="#A5D6A7" style="background:#A5D6A7;" title="#A5D6A7"></div>
+          <div class="pgbg-swatch" data-color="#80DEEA" style="background:#80DEEA;" title="#80DEEA"></div>
+          <div class="pgbg-swatch" data-color="#9FA8DA" style="background:#9FA8DA;" title="#9FA8DA"></div>
+
+          <!-- ROW 4 -->
+          <div class="pgbg-swatch" data-color="#616161" style="background:#616161;" title="#616161"></div>
+          <div class="pgbg-swatch" data-color="#424242" style="background:#424242;" title="#424242"></div>
+          <div class="pgbg-swatch" data-color="#E53935" style="background:#E53935;" title="#E53935"></div>
+          <div class="pgbg-swatch" data-color="#FB8C00" style="background:#FB8C00;" title="#FB8C00"></div>
+          <div class="pgbg-swatch" data-color="#FDD835" style="background:#FDD835;" title="#FDD835"></div>
+          <div class="pgbg-swatch" data-color="#43A047" style="background:#43A047;" title="#43A047"></div>
+          <div class="pgbg-swatch" data-color="#00ACC1" style="background:#00ACC1;" title="#00ACC1"></div>
+          <div class="pgbg-swatch" data-color="#5C6BC0" style="background:#5C6BC0;" title="#5C6BC0"></div>
+
+          <!-- ROW 5 -->
+          <div class="pgbg-swatch" data-color="#212121" style="background:#212121;" title="#212121"></div>
+          <div class="pgbg-swatch" data-color="#1A1A1A" style="background:#1A1A1A;" title="#1A1A1A"></div>
+          <div class="pgbg-swatch" data-color="#C62828" style="background:#C62828;" title="#C62828"></div>
+          <div class="pgbg-swatch" data-color="#E65100" style="background:#E65100;" title="#E65100"></div>
+          <div class="pgbg-swatch" data-color="#F9A825" style="background:#F9A825;" title="#F9A825"></div>
+          <div class="pgbg-swatch" data-color="#2E7D32" style="background:#2E7D32;" title="#2E7D32"></div>
+          <div class="pgbg-swatch" data-color="#00838F" style="background:#00838F;" title="#00838F"></div>
+          <div class="pgbg-swatch" data-color="#3949AB" style="background:#3949AB;" title="#3949AB"></div>
+
+          <!-- ROW 6 — Darkest -->
+          <div class="pgbg-swatch" data-color="#000000" style="background:#000000;border:1px solid var(--border);" title="#000000"></div>
+          <div class="pgbg-swatch" data-color="#111827" style="background:#111827;" title="#111827"></div>
+          <div class="pgbg-swatch" data-color="#7F0000" style="background:#7F0000;" title="#7F0000"></div>
+          <div class="pgbg-swatch" data-color="#7A2900" style="background:#7A2900;" title="#7A2900"></div>
+          <div class="pgbg-swatch" data-color="#795548" style="background:#795548;" title="#795548"></div>
+          <div class="pgbg-swatch" data-color="#1B5E20" style="background:#1B5E20;" title="#1B5E20"></div>
+          <div class="pgbg-swatch" data-color="#006064" style="background:#006064;" title="#006064"></div>
+          <div class="pgbg-swatch" data-color="#1A237E" style="background:#1A237E;" title="#1A237E"></div>
+
+        </div><!-- /pgbg-grid -->
+
+
+        <!-- ── STANDARD COLORS ── -->
+        <p class="mb-1 mt-2"
+          style="font-size:10px;font-weight:700;color:var(--text);letter-spacing:0.5px;">
+          Standard Colors
+        </p>
+        <div class="pgbg-standard-row">
+          <div class="pgbg-standard-swatch" data-color="#FF0000" style="background:#FF0000;" title="Red"></div>
+          <div class="pgbg-standard-swatch" data-color="#FF6D00" style="background:#FF6D00;" title="Orange"></div>
+          <div class="pgbg-standard-swatch" data-color="#FFD600" style="background:#FFD600;" title="Yellow"></div>
+          <div class="pgbg-standard-swatch" data-color="#00C853" style="background:#00C853;" title="Green"></div>
+          <div class="pgbg-standard-swatch" data-color="#00BCD4" style="background:#00BCD4;" title="Cyan"></div>
+          <div class="pgbg-standard-swatch" data-color="#2979FF" style="background:#2979FF;" title="Blue"></div>
+          <div class="pgbg-standard-swatch" data-color="#D500F9" style="background:#D500F9;" title="Purple"></div>
+          <div class="pgbg-standard-swatch" data-color="#FF1744" style="background:#FF1744;" title="Rose"></div>
+        </div>
+
+
+        <!-- ── MORE COLORS: Hex input + native picker ── -->
+        <div class="d-flex align-items-center gap-2 mt-1 mb-3">
+
+          <label for="pgbg-color-picker"
+            style="display:flex;align-items:center;gap:5px;cursor:pointer;
+                   font-size:11px;color:var(--text-muted);">
+            <input type="color" id="pgbg-color-picker" value="#ffffff"
+              style="width:0;height:0;opacity:0;position:absolute;pointer-events:none;"/>
+            <i class="bi bi-circle-half" style="font-size:15px;color:var(--accent2);"></i>
+            <span>More Colors</span>
+          </label>
+
+          <div class="input-group input-group-sm" style="max-width:160px;">
+            <span class="input-group-text"
+              style="background:var(--bg-item);border:1px solid var(--border);
+                     color:var(--text-muted);font-size:11px;padding:3px 8px;">
+              #
+            </span>
+            <input type="text" id="pgbg-color-hex"
+              class="form-control form-control-sm"
+              placeholder="e.g. FF0000" maxlength="7"
+              style="background:var(--bg-item);color:var(--text);
+                     border:1px solid var(--border);font-size:11px;
+                     font-family:monospace;"/>
+          </div>
+
+          <div id="pgbg-hex-preview-chip"
+            style="width:24px;height:24px;border-radius:4px;
+                   background:transparent;border:1px solid var(--border);
+                   flex-shrink:0;transition:background .15s;">
+          </div>
+
+        </div>
+
+
+        <!-- ── APPLY TO SCOPE ── -->
+        <div class="pt-3" style="border-top:1px solid var(--border);">
+          <p style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+                    color:var(--text-muted);font-weight:600;" class="mb-2">
+            Apply To
+          </p>
+          <div class="d-flex gap-2">
+
+            <!-- Current Page (default) -->
+            <label class="pgbg-scope-label" data-scope="current"
+              style="border-color:var(--accent2);">
+              <input type="radio" name="bg-scope" id="bg-scope-current"
+                value="current" checked
+                style="accent-color:var(--accent2);width:14px;height:14px;"/>
+              <span>
+                <i class="bi bi-file-earmark me-1"></i>Current Page
+              </span>
+            </label>
+
+            <!-- All Pages -->
+            <label class="pgbg-scope-label" data-scope="all">
+              <input type="radio" name="bg-scope" id="bg-scope-all"
+                value="all"
+                style="accent-color:var(--accent2);width:14px;height:14px;"/>
+              <span>
+                <i class="bi bi-files me-1"></i>All Pages
+              </span>
+            </label>
+
+          </div>
+        </div>
+
+      </div><!-- /modal-body -->
+
+
+      <!-- ── FOOTER ── -->
+      <div class="modal-footer"
+        style="border-top:1px solid var(--border);
+               justify-content:space-between;padding:10px 16px;">
+
+        <!-- Left: Remove actions -->
+        <div class="d-flex gap-2">
+          <button type="button" id="btn-remove-bg-current"
+            class="btn btn-sm"
+            style="background:transparent;color:var(--accent);
+                   border:1px solid var(--accent);font-size:12px;">
+            <i class="bi bi-file-earmark-x me-1"></i>Remove Current
+          </button>
+          <button type="button" id="btn-remove-bg-all"
+            class="btn btn-sm"
+            style="background:transparent;color:var(--text-muted);
+                   border:1px solid var(--border);font-size:12px;">
+            <i class="bi bi-x-circle me-1"></i>Remove All
+          </button>
+        </div>
+
+        <!-- Right: Cancel + Apply -->
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm" data-bs-dismiss="modal"
+            style="background:var(--bg-item);color:var(--text);
+                   border:1px solid var(--border);font-size:12px;">
+            Cancel
+          </button>
+          <button type="button" id="btn-apply-bg"
+            class="btn btn-sm"
+            style="background:var(--accent2);color:#000;border:none;font-size:12px;">
+            <i class="bi bi-check2 me-1"></i>Apply
+          </button>
+        </div>
+
+      </div><!-- /modal-footer -->
+
+    </div><!-- /modal-content -->
+  </div><!-- /modal-dialog -->
+</div><!-- /#modal-page-background -->
+
+<!-- ═══════════════════════════════════════════════════════════════
+  PAGE NUMBERING MODAL  (#modal-page-numbering)
+  ─────────────────────────────────────────────────────────────
+  WHERE TO ADD:
+  1. Find:   <script src="leftpanel.js"></script>
+  2. Paste this ENTIRE block ABOVE that line.
+  ═══════════════════════════════════════════════════════════════ -->
+
+<div class="modal fade" id="modal-page-numbering" tabindex="-1"
+  aria-labelledby="modalPageNumberingLabel" aria-hidden="true">
+
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content"
+      style="background:var(--bg-panel);border:1px solid var(--border);color:var(--text);">
+
+      <!-- ── HEADER ── -->
+      <div class="modal-header" style="border-bottom:1px solid var(--border);padding:12px 16px;">
+        <h6 class="modal-title mb-0" id="modalPageNumberingLabel">
+          <i class="bi bi-list-ol me-2"></i>Page Numbering
+        </h6>
+        <button type="button" class="btn-close btn-close-white"
+          data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════
+           MODAL BODY
+           ══════════════════════════════════════════════════════ -->
+      <div class="modal-body" style="padding:16px;">
+
+        <div class="row g-3">
+
+          <!-- ╔══════════════════════════════════════════════╗
+               ║  LEFT COLUMN  (Position + Format)           ║
+               ╚══════════════════════════════════════════════╝ -->
+          <div class="col-12 col-md-7">
+
+            <!-- ─────────────────────────────────────────────
+                 PART A: POSITION
+                 Six buttons in a 3-column grid showing a mini
+                 page diagram with the number-bar in position.
+                 data-position must match NUM_POSITION_MAP keys.
+                 ───────────────────────────────────────────── -->
+            <p class="mb-2"
+              style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+                     color:var(--text-muted);font-weight:600;">
+              Position
+            </p>
+
+            <div class="num-position-grid">
+
+              <!-- Top Left -->
+              <button class="num-position-btn" data-position="top-left"
+                style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);">
+                <div class="num-pos-diagram">
+                  <span class="num-pos-dot" style="top:4px;left:3px;"></span>
+                </div>
+                <div style="font-weight:600;font-size:10px;">Top Left</div>
+              </button>
+
+              <!-- Top Center -->
+              <button class="num-position-btn" data-position="top-center"
+                style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);">
+                <div class="num-pos-diagram">
+                  <span class="num-pos-dot" style="top:4px;left:50%;transform:translateX(-50%);"></span>
+                </div>
+                <div style="font-weight:600;font-size:10px;">Top Center</div>
+              </button>
+
+              <!-- Top Right -->
+              <button class="num-position-btn" data-position="top-right"
+                style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);">
+                <div class="num-pos-diagram">
+                  <span class="num-pos-dot" style="top:4px;right:3px;"></span>
+                </div>
+                <div style="font-weight:600;font-size:10px;">Top Right</div>
+              </button>
+
+              <!-- Bottom Left -->
+              <button class="num-position-btn" data-position="bottom-left"
+                style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);">
+                <div class="num-pos-diagram">
+                  <span class="num-pos-dot" style="bottom:4px;left:3px;"></span>
+                </div>
+                <div style="font-weight:600;font-size:10px;">Bottom Left</div>
+              </button>
+
+              <!-- Bottom Center (DEFAULT active) -->
+              <button class="num-position-btn" data-position="bottom-center"
+                style="background:rgba(78,205,196,0.12);color:var(--accent2);border:1px solid var(--accent2);">
+                <div class="num-pos-diagram">
+                  <span class="num-pos-dot" style="bottom:4px;left:50%;transform:translateX(-50%);"></span>
+                </div>
+                <div style="font-weight:600;font-size:10px;">Bottom Center</div>
+              </button>
+
+              <!-- Bottom Right -->
+              <button class="num-position-btn" data-position="bottom-right"
+                style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);">
+                <div class="num-pos-diagram">
+                  <span class="num-pos-dot" style="bottom:4px;right:3px;"></span>
+                </div>
+                <div style="font-weight:600;font-size:10px;">Bottom Right</div>
+              </button>
+
+            </div><!-- /num-position-grid -->
+
+
+            <!-- ─────────────────────────────────────────────
+                 PART B: NUMBER FORMAT
+                 Six format buttons in a 3-column grid.
+                 data-format must match formatPageNumber() cases.
+                 ───────────────────────────────────────────── -->
+            <p class="mb-2"
+              style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+                     color:var(--text-muted);font-weight:600;">
+              Number Format
+            </p>
+
+            <div class="num-format-grid">
+
+              <!-- Arabic 1, 2, 3 (DEFAULT active) -->
+              <button class="num-format-btn" data-format="arabic"
+                style="background:rgba(78,205,196,0.12);color:var(--accent2);border:1px solid var(--accent2);">
+                <span class="num-fmt-label">1, 2, 3</span>
+                <span class="num-fmt-sub">Arabic</span>
+              </button>
+
+              <!-- Roman Upper I, II, III -->
+              <button class="num-format-btn" data-format="roman-upper"
+                style="background:var(--bg-item);color:var(--text-muted);border:1px solid var(--border);">
+                <span class="num-fmt-label">I, II, III</span>
+                <span class="num-fmt-sub">Roman Upper</span>
+              </button>
+
+              <!-- Roman Lower i, ii, iii -->
+              <button class="num-format-btn" data-format="roman-lower"
+                style="background:var(--bg-item);color:var(--text-muted);border:1px solid var(--border);">
+                <span class="num-fmt-label">i, ii, iii</span>
+                <span class="num-fmt-sub">Roman Lower</span>
+              </button>
+
+              <!-- Alpha Upper A, B, C -->
+              <button class="num-format-btn" data-format="alpha-upper"
+                style="background:var(--bg-item);color:var(--text-muted);border:1px solid var(--border);">
+                <span class="num-fmt-label">A, B, C</span>
+                <span class="num-fmt-sub">Alphabet Upper</span>
+              </button>
+
+              <!-- Alpha Lower a, b, c -->
+              <button class="num-format-btn" data-format="alpha-lower"
+                style="background:var(--bg-item);color:var(--text-muted);border:1px solid var(--border);">
+                <span class="num-fmt-label">a, b, c</span>
+                <span class="num-fmt-sub">Alphabet Lower</span>
+              </button>
+
+              <!-- Hyphen -1-, -2-, -3- -->
+              <button class="num-format-btn" data-format="hyphen"
+                style="background:var(--bg-item);color:var(--text-muted);border:1px solid var(--border);">
+                <span class="num-fmt-label">-1-, -2-</span>
+                <span class="num-fmt-sub">Hyphen</span>
+              </button>
+
+            </div><!-- /num-format-grid -->
+
+          </div><!-- /col left -->
+
+
+          <!-- ╔══════════════════════════════════════════════╗
+               ║  RIGHT COLUMN  (Live Preview)               ║
+               ╚══════════════════════════════════════════════╝ -->
+          <div class="col-12 col-md-5">
+
+            <!-- ─────────────────────────────────────────────
+                 PART C: LIVE PREVIEW
+                 A 3×3 grid mini-page showing where the number
+                 will appear. updateNumberingPreview() in JS
+                 activates the correct slot.
+                 ───────────────────────────────────────────── -->
+            <p class="mb-2"
+              style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+                     color:var(--text-muted);font-weight:600;">
+              Preview
+            </p>
+
+            <div style="display:flex;align-items:center;justify-content:center;
+                        background:var(--bg-dark);border-radius:6px;
+                        padding:20px;min-height:150px;">
+
+              <!-- id="num-live-preview" — controlled by Section 17 JS -->
+              <div id="num-live-preview">
+
+                <!-- ── TOP ROW: 3 position slots ── -->
+                <span class="num-preview-pos" data-preview-pos="top-left"></span>
+                <span class="num-preview-pos" data-preview-pos="top-center"></span>
+                <span class="num-preview-pos" data-preview-pos="top-right"></span>
+
+                <!-- ── MIDDLE: simulated page-content lines ── -->
+                <div class="num-preview-lines">
+                  <div class="num-preview-line" style="width:85%;"></div>
+                  <div class="num-preview-line" style="width:100%;"></div>
+                  <div class="num-preview-line" style="width:72%;"></div>
+                  <div class="num-preview-line" style="width:90%;"></div>
+                  <div class="num-preview-line" style="width:60%;"></div>
+                </div>
+
+                <!-- ── BOTTOM ROW: 3 position slots ── -->
+                <span class="num-preview-pos" data-preview-pos="bottom-left"></span>
+                <span class="num-preview-pos" data-preview-pos="bottom-center"></span>
+                <span class="num-preview-pos" data-preview-pos="bottom-right"></span>
+
+              </div><!-- /#num-live-preview -->
+
+            </div>
+
+          </div><!-- /col right -->
+
+        </div><!-- /row -->
+
+
+        <!-- ════════════════════════════════════════════════════
+             PART D: PAGE NUMBERING MODE
+             Continue from previous OR Start At with validator.
+             ════════════════════════════════════════════════════ -->
+        <div class="mt-3 pt-3" style="border-top:1px solid var(--border);">
+
+          <p style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+                    color:var(--text-muted);font-weight:600;" class="mb-2">
+            Page Numbering
+          </p>
+
+          <!-- Mode toggle row -->
+          <div class="d-flex gap-2 mb-0">
+
+            <!-- Continue from previous section (DEFAULT) -->
+            <label class="num-mode-label" id="num-mode-continue-label"
+              style="border-color:var(--accent2);">
+              <input type="radio" name="num-start-mode" id="num-mode-continue"
+                value="continue" checked
+                style="accent-color:var(--accent2);width:14px;height:14px;"/>
+              <span>
+                <i class="bi bi-arrow-right-circle me-1"></i>Continue from previous
+              </span>
+            </label>
+
+            <!-- Start At -->
+            <label class="num-mode-label" id="num-mode-startat-label"
+              style="border-color:var(--border);">
+              <input type="radio" name="num-start-mode" id="num-mode-startat"
+                value="start-at"
+                style="accent-color:var(--accent2);width:14px;height:14px;"/>
+              <span>
+                <i class="bi bi-hash me-1"></i>Start at
+              </span>
+            </label>
+
+          </div><!-- /mode toggle -->
+
+
+          <!-- ── Start At input row ──────────────────────────
+               Hidden by default. Shown by JS when "Start at"
+               radio is selected (SECTION 13).
+               ─────────────────────────────────────────────── -->
+          <div id="num-start-at-row">
+
+            <!-- Input + inline formatted preview -->
+            <div class="num-start-at-input-wrap">
+              <label style="font-size:11px;color:var(--text-muted);white-space:nowrap;">
+                Start value:
+              </label>
+              <input
+                type="text"
+                id="num-start-at-input"
+                class="form-control form-control-sm"
+                placeholder="e.g.  1  /  IV  /  C  /  -3-"
+                maxlength="12"
+                style="background:var(--bg-item);color:var(--text);
+                       border:1px solid var(--border);font-size:12px;
+                       font-family:monospace;max-width:160px;"
+              />
+              <!-- Shows formatted result of valid input, or "Default: x" when invalid -->
+              <span id="num-start-at-preview"
+                style="font-size:11px;font-weight:700;color:var(--accent2);
+                       white-space:nowrap;font-family:monospace;">
+              </span>
+            </div>
+
+            <!-- Error / warning feedback line -->
+            <div id="num-start-at-feedback"
+              style="font-size:10px;color:var(--accent);min-height:14px;padding-left:2px;">
+            </div>
+
+            <!-- Contextual hint — changes based on active format -->
+            <div style="font-size:10px;color:var(--text-muted);font-style:italic;padding-left:2px;">
+              <span id="num-start-at-hint"></span>
+            </div>
+
+          </div><!-- /#num-start-at-row -->
+
+        </div><!-- /PART D -->
+
+      </div><!-- /modal-body -->
+
+
+      <!-- ── FOOTER ── -->
+      <div class="modal-footer"
+        style="border-top:1px solid var(--border);
+               justify-content:space-between;padding:10px 16px;">
+
+        <!-- Left: Remove button -->
+        <div class="d-flex gap-2">
+          <button type="button" id="btn-remove-numbering"
+            class="btn btn-sm"
+            style="background:transparent;color:var(--accent);
+                   border:1px solid var(--accent);font-size:12px;">
+            <i class="bi bi-trash3 me-1"></i>Remove Numbering
+          </button>
+        </div>
+
+        <!-- Right: Cancel + Apply -->
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm" data-bs-dismiss="modal"
+            style="background:var(--bg-item);color:var(--text);
+                   border:1px solid var(--border);font-size:12px;">
+            Cancel
+          </button>
+          <button type="button" id="btn-apply-numbering"
+            class="btn btn-sm"
+            style="background:var(--accent2);color:#000;border:none;font-size:12px;">
+            <i class="bi bi-check2 me-1"></i>Apply
+          </button>
+        </div>
+
+      </div><!-- /modal-footer -->
+
+    </div><!-- /modal-content -->
+  </div><!-- /modal-dialog -->
+</div><!-- /#modal-page-numbering -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+  PAGE HEADER MODAL  (#modal-page-header)
+  ─────────────────────────────────────────────────────────────────
+  Paste this AFTER the closing </div> of #modal-page-numbering
+  (after line 2630)
+  ═══════════════════════════════════════════════════════════════ -->
+
+<div class="modal fade" id="modal-page-header" tabindex="-1"
+  aria-labelledby="modalPageHeaderLabel" aria-hidden="true">
+
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content"
+      style="background:var(--bg-panel);border:1px solid var(--border);color:var(--text);">
+
+      <!-- ── MODAL HEADER ── -->
+      <div class="modal-header" style="border-bottom:1px solid var(--border);padding:12px 16px;">
+        <h6 class="modal-title mb-0" id="modalPageHeaderLabel">
+          <i class="bi bi-layout-text-window-reverse me-2"></i>Page Header
+        </h6>
+        <button type="button" class="btn-close btn-close-white"
+          data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- ── MODAL BODY ── -->
+      <div class="modal-body" style="padding:16px;">
+
+        <!-- ── ENABLE TOGGLE ROW ── -->
+        <div class="d-flex align-items-center justify-content-between mb-3 pb-3"
+          style="border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:500;">Enable Header</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">
+              Adds a 3-column header row above page content
+            </div>
+          </div>
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" role="switch"
+              id="header-enable-toggle"
+              style="cursor:pointer;width:40px;height:20px;margin-top:2px;">
+          </div>
+        </div>
+
+        <!-- ── OPTIONS BODY (dims when disabled) ── -->
+        <div id="header-modal-body" style="opacity:0.4;transition:opacity 0.25s;pointer-events:none;">
+
+          <!-- ── APPLY SCOPE ── -->
+          <p style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+            color:var(--text-muted);font-weight:600;" class="mb-2">Apply To</p>
+
+          <div class="d-flex gap-2 mb-3">
+
+            <!-- Current Page -->
+            <button class="header-scope-btn" data-scope="current"
+              style="background:var(--bg-item);color:var(--text);
+              border:1px solid var(--border);border-radius:6px;
+              padding:10px 8px;flex:1;font-size:11px;cursor:pointer;
+              text-align:center;transition:all .15s;">
+              <div style="font-size:18px;margin-bottom:5px;">
+                <i class="bi bi-file-earmark"></i>
+              </div>
+              <div style="font-weight:600;margin-bottom:2px;">Current</div>
+              <div style="font-size:9px;color:var(--text-muted);">This page only</div>
+            </button>
+
+            <!-- All Except First -->
+            <button class="header-scope-btn" data-scope="all-except-first"
+              style="background:var(--bg-item);color:var(--text);
+              border:1px solid var(--border);border-radius:6px;
+              padding:10px 8px;flex:1;font-size:11px;cursor:pointer;
+              text-align:center;transition:all .15s;">
+              <div style="font-size:18px;margin-bottom:5px;">
+                <i class="bi bi-files"></i>
+              </div>
+              <div style="font-weight:600;margin-bottom:2px;">All Except First</div>
+              <div style="font-size:9px;color:var(--text-muted);">Skip cover page</div>
+            </button>
+
+            <!-- All Pages -->
+            <button class="header-scope-btn" data-scope="all"
+              style="background:rgba(78,205,196,0.12);color:var(--accent2);
+              border:1px solid var(--accent2);border-radius:6px;
+              padding:10px 8px;flex:1;font-size:11px;cursor:pointer;
+              text-align:center;transition:all .15s;">
+              <div style="font-size:18px;margin-bottom:5px;">
+                <i class="bi bi-file-earmark-text"></i>
+              </div>
+              <div style="font-weight:600;margin-bottom:2px;">All Pages</div>
+              <div style="font-size:9px;color:var(--text-muted);">Every page</div>
+            </button>
+
+          </div>
+
+          <!-- ── HOW TO USE NOTE ── -->
+          <div style="background:var(--bg-item);border-radius:6px;
+            padding:10px 12px;border-left:3px solid var(--accent2);">
+            <p style="font-size:10px;color:var(--text-muted);margin:0;line-height:1.6;">
+              <i class="bi bi-info-circle me-1" style="color:var(--accent2);"></i>
+              <strong style="color:var(--text);">How to edit:</strong>
+              Double-click the header area on any page to start editing.
+              Double-click anywhere outside the header to finish.
+            </p>
+          </div>
+
+        </div>
+        <!-- /header-modal-body -->
+
+      </div>
+      <!-- /modal-body -->
+
+      <!-- ── MODAL FOOTER ── -->
+      <div class="modal-footer"
+        style="border-top:1px solid var(--border);
+        display:flex;justify-content:space-between;padding:10px 16px;">
+
+        <!-- Left: Remove -->
+        <button type="button" id="btn-remove-header" class="btn btn-sm"
+          style="background:transparent;color:var(--accent);
+          border:1px solid var(--accent);font-size:12px;">
+          <i class="bi bi-trash3 me-1"></i>Remove Header
+        </button>
+
+        <!-- Right: Cancel + Apply -->
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm" data-bs-dismiss="modal"
+            style="background:var(--bg-item);color:var(--text);
+            border:1px solid var(--border);font-size:12px;">
+            Cancel
+          </button>
+          <button type="button" id="btn-apply-header" class="btn btn-sm"
+            style="background:var(--accent2);color:#000;border:none;font-size:12px;">
+            <i class="bi bi-check2 me-1"></i>Apply
+          </button>
+        </div>
+
+      </div>
+      <!-- /modal-footer -->
+
+    </div>
+  </div>
+</div>
+<!-- /#modal-page-header -->
+
+<!-- ═══════════════════════════════════════════════════════════════
+  PAGE FOOTER MODAL  (#modal-page-footer)
+  ─────────────────────────────────────────────────────────────────
+  Paste this AFTER the closing </div> of #modal-page-header
+  ═══════════════════════════════════════════════════════════════ -->
+
+<div class="modal fade" id="modal-page-footer" tabindex="-1"
+  aria-labelledby="modalPageFooterLabel" aria-hidden="true">
+
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content"
+      style="background:var(--bg-panel);border:1px solid var(--border);color:var(--text);">
+
+      <!-- ── MODAL HEADER ── -->
+      <div class="modal-header" style="border-bottom:1px solid var(--border);padding:12px 16px;">
+        <h6 class="modal-title mb-0" id="modalPageFooterLabel">
+          <i class="bi bi-layout-text-window me-2"></i>Page Footer
+        </h6>
+        <button type="button" class="btn-close btn-close-white"
+          data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- ── MODAL BODY ── -->
+      <div class="modal-body" style="padding:16px;">
+
+        <!-- ── ENABLE TOGGLE ROW ── -->
+        <div class="d-flex align-items-center justify-content-between mb-3 pb-3"
+          style="border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:500;">Enable Footer</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">
+              Adds a 3-column footer row below page content
+            </div>
+          </div>
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" role="switch"
+              id="footer-enable-toggle"
+              style="cursor:pointer;width:40px;height:20px;margin-top:2px;">
+          </div>
+        </div>
+
+        <!-- ── OPTIONS BODY (dims when disabled) ── -->
+        <div id="footer-modal-body"
+          style="opacity:0.4;transition:opacity 0.25s;pointer-events:none;">
+
+          <!-- ── APPLY SCOPE ── -->
+          <p style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+            color:var(--text-muted);font-weight:600;" class="mb-2">Apply To</p>
+
+          <div class="d-flex gap-2 mb-3">
+
+            <!-- Current Page -->
+            <button class="footer-scope-btn" data-scope="current"
+              style="background:var(--bg-item);color:var(--text);
+              border:1px solid var(--border);border-radius:6px;
+              padding:10px 8px;flex:1;font-size:11px;cursor:pointer;
+              text-align:center;transition:all .15s;">
+              <div style="font-size:18px;margin-bottom:5px;">
+                <i class="bi bi-file-earmark"></i>
+              </div>
+              <div style="font-weight:600;margin-bottom:2px;">Current</div>
+              <div style="font-size:9px;color:var(--text-muted);">This page only</div>
+            </button>
+
+            <!-- All Except First -->
+            <button class="footer-scope-btn" data-scope="all-except-first"
+              style="background:var(--bg-item);color:var(--text);
+              border:1px solid var(--border);border-radius:6px;
+              padding:10px 8px;flex:1;font-size:11px;cursor:pointer;
+              text-align:center;transition:all .15s;">
+              <div style="font-size:18px;margin-bottom:5px;">
+                <i class="bi bi-files"></i>
+              </div>
+              <div style="font-weight:600;margin-bottom:2px;">All Except First</div>
+              <div style="font-size:9px;color:var(--text-muted);">Skip cover page</div>
+            </button>
+
+            <!-- All Pages -->
+            <button class="footer-scope-btn" data-scope="all"
+              style="background:rgba(78,205,196,0.12);color:var(--accent2);
+              border:1px solid var(--accent2);border-radius:6px;
+              padding:10px 8px;flex:1;font-size:11px;cursor:pointer;
+              text-align:center;transition:all .15s;">
+              <div style="font-size:18px;margin-bottom:5px;">
+                <i class="bi bi-file-earmark-text"></i>
+              </div>
+              <div style="font-weight:600;margin-bottom:2px;">All Pages</div>
+              <div style="font-size:9px;color:var(--text-muted);">Every page</div>
+            </button>
+
+          </div>
+
+          <!-- ── HOW TO USE NOTE ── -->
+          <div style="background:var(--bg-item);border-radius:6px;
+            padding:10px 12px;border-left:3px solid var(--accent2);">
+            <p style="font-size:10px;color:var(--text-muted);margin:0;line-height:1.6;">
+              <i class="bi bi-info-circle me-1" style="color:var(--accent2);"></i>
+              <strong style="color:var(--text);">How to edit:</strong>
+              Double-click the footer area on any page to start editing.
+              Double-click anywhere outside the footer to finish.
+            </p>
+          </div>
+
+        </div>
+        <!-- /footer-modal-body -->
+
+      </div>
+      <!-- /modal-body -->
+
+      <!-- ── MODAL FOOTER ── -->
+      <div class="modal-footer"
+        style="border-top:1px solid var(--border);
+        display:flex;justify-content:space-between;padding:10px 16px;">
+
+        <!-- Left: Remove -->
+        <button type="button" id="btn-remove-footer" class="btn btn-sm"
+          style="background:transparent;color:var(--accent);
+          border:1px solid var(--accent);font-size:12px;">
+          <i class="bi bi-trash3 me-1"></i>Remove Footer
+        </button>
+
+        <!-- Right: Cancel + Apply -->
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm" data-bs-dismiss="modal"
+            style="background:var(--bg-item);color:var(--text);
+            border:1px solid var(--border);font-size:12px;">
+            Cancel
+          </button>
+          <button type="button" id="btn-apply-footer" class="btn btn-sm"
+            style="background:var(--accent2);color:#000;border:none;font-size:12px;">
+            <i class="bi bi-check2 me-1"></i>Apply
+          </button>
+        </div>
+
+      </div>
+      <!-- /modal-footer -->
+
+    </div>
+  </div>
+</div>
+<!-- /#modal-page-footer -->
+
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+  ▶ SCRIPT TAG TO ADD
+  ─────────────────────────────────────────────────────────────────
+  In template_builder.html, find the line:
+      <script src="page-style-margin.js"></script>
+  And add this line directly BELOW it:
+      <script src="page-style-border.js"></script>
+  ═══════════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════════
+  ▶ COLOR PREVIEW CHIP SYNC  (tiny inline script — add alongside
+    the modal just above, before </body>)
+  ─────────────────────────────────────────────────────────────────
+  This keeps the small preview chip in the hex row in sync with
+  the currently selected color.
+  Place this <script> block right before </body>
+  ═══════════════════════════════════════════════════════════════ -->
+<script>
+  // Keeps the color chip next to the hex input in sync
+  document.getElementById('border-color-hex').addEventListener('input', function () {
+    const chip = document.getElementById('border-hex-preview-chip');
+    const val  = this.value.trim();
+    if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(val)) {
+      chip.style.background = val;
+    }
+  });
+  document.getElementById('border-color-picker').addEventListener('input', function () {
+    document.getElementById('border-hex-preview-chip').style.background = this.value;
+  });
+  document.querySelectorAll('.border-color-swatch').forEach(s => {
+    s.addEventListener('click', function () {
+      document.getElementById('border-hex-preview-chip').style.background = this.dataset.color;
+    });
+  });
+</script>
+
+
+
+
+
+
+
+  <script src="leftpanel.js"></script>
+  <script src="pagestyle.js"></script>
+  <script src="page-style-margin.js"></script>
+  <script src="page-style-border.js"></script>
+  <script src="page-style-background.js"></script>
+  <script src="page-style-numbering.js"></script>
+  <script src="page-style-header.js"></script>
+  <script src="page-style-footer.js"></script>
+  
+</body>
+</html>

@@ -1,0 +1,222 @@
+/* ════════════════════════════════════════════════
+   PAGE STYLE — PAGE NUMBERING
+   page-style-numbering.css
+   ════════════════════════════════════════════════ */
+
+
+/* ── Position Button 3×2 Grid ── */
+.num-position-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.num-position-btn {
+  background: var(--bg-item);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 6px;
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition: all .15s;
+}
+
+.num-position-btn:hover {
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
+
+/* ── Mini page diagram inside each position button ── */
+.num-pos-diagram {
+  width: 26px;
+  height: 32px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  margin: 0 auto 5px;
+  position: relative;
+}
+
+/* The small bar that indicates where the number sits */
+.num-pos-dot {
+  width: 12px;
+  height: 2.5px;
+  background: currentColor;
+  border-radius: 1px;
+  position: absolute;
+  opacity: 0.9;
+}
+
+
+/* ── Number Format Button Grid ── */
+.num-format-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.num-format-btn {
+  background: var(--bg-item);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 9px 6px 7px;
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition: all .15s;
+  line-height: 1.3;
+}
+
+.num-format-btn:hover {
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
+
+.num-format-btn .num-fmt-label {
+  font-size: 12px;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 3px;
+  letter-spacing: 0.3px;
+  font-family: 'Segoe UI', monospace;
+}
+
+.num-format-btn .num-fmt-sub {
+  font-size: 9px;
+  opacity: 0.7;
+  display: block;
+}
+
+
+/* ════════════════════════════════════
+   LIVE PREVIEW BOX
+   Uses a CSS grid to place number in
+   one of 6 positions inside the page.
+   ════════════════════════════════════ */
+
+#num-live-preview {
+  width: 80px;
+  height: 104px;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid #ccc;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 16px 1fr 16px;
+  overflow: hidden;
+}
+
+/* The 6 number-slot spans */
+.num-preview-pos {
+  font-size: 6.5px;
+  font-weight: 700;
+  color: var(--accent2);
+  opacity: 0;                /* hidden until JS activates */
+  transition: opacity .2s, color .2s;
+  padding: 2px 3px;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Explicit grid placement for each slot */
+.num-preview-pos[data-preview-pos="top-left"]      { grid-area: 1 / 1; text-align: left;   align-self: start; }
+.num-preview-pos[data-preview-pos="top-center"]    { grid-area: 1 / 2; text-align: center; align-self: start; }
+.num-preview-pos[data-preview-pos="top-right"]     { grid-area: 1 / 3; text-align: right;  align-self: start; }
+.num-preview-pos[data-preview-pos="bottom-left"]   { grid-area: 3 / 1; text-align: left;   align-self: end;   }
+.num-preview-pos[data-preview-pos="bottom-center"] { grid-area: 3 / 2; text-align: center; align-self: end;   }
+.num-preview-pos[data-preview-pos="bottom-right"]  { grid-area: 3 / 3; text-align: right;  align-self: end;   }
+
+/* Simulated page-content lines (middle row) */
+.num-preview-lines {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  padding: 5px 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  justify-content: center;
+}
+
+.num-preview-line {
+  height: 2px;
+  background: #ddd;
+  border-radius: 1px;
+  width: 100%;
+}
+
+
+/* ════════════════════════════════════
+   PAGE NUMBERING MODE SECTION
+   (Continue / Start At toggle)
+   ════════════════════════════════════ */
+
+/* Mode radio labels */
+.num-mode-label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-item);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text);
+  transition: border-color .15s;
+}
+
+.num-mode-label:hover {
+  border-color: var(--accent2);
+}
+
+
+/* ── Start At input row (hidden by default; shown by JS) ── */
+#num-start-at-row {
+  display: none;              /* toggled by JS */
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 10px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.num-start-at-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Feedback line below input (shows errors or formatted preview) */
+#num-start-at-feedback {
+  font-size: 10px;
+  min-height: 14px;
+  transition: color .15s;
+  padding-left: 2px;
+}
+
+/* The "→ formatted value" preview beside input */
+#num-start-at-preview {
+  font-size: 11px;
+  font-weight: 700;
+  min-height: 14px;
+  white-space: nowrap;
+  font-family: monospace;
+}
+
+/* Context hint under input */
+#num-start-at-hint {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+}
