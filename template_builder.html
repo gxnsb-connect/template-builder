@@ -685,6 +685,29 @@
 </div>
     </div>
 
+    <!-- ══════════════════════════════════════
+         WATERMARK BUTTON  (Chunk 1)
+         Sits in builder-footer between
+         Page Style and Placeholders
+    ══════════════════════════════════════ -->
+    <div class="vr opacity-25"></div>
+
+    <div class="d-flex align-items-center gap-2">
+      <button
+        id="btn-watermark-open"
+        class="btn btn-sm d-flex align-items-center gap-1"
+        style="background:var(--bg-item);color:var(--text);border:1px solid var(--border);font-size:12px;"
+        type="button"
+        data-bs-toggle="modal"
+        data-bs-target="#modal-page-watermark"
+      >
+        <i class="bi bi-water"></i> Watermark
+      </button>
+    </div>
+    <!-- ══ END WATERMARK BUTTON (Chunk 1) ══ -->
+
+
+
     <div class="vr opacity-25"></div>
 
     <!-- Placeholders Dropdown -->
@@ -2986,6 +3009,342 @@ document.getElementById('btn-add-placeholder').addEventListener('click', () => {
 
 
 
+
+<!-- ══════════════════════════════════════════════════════════════
+     WATERMARK MODAL  (#modal-page-watermark)
+     CHUNK 2 — Paste after <!-- /#modal-page-footer -->
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modal-page-watermark" tabindex="-1"
+  aria-labelledby="modalPageWatermarkLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered"
+    style="max-width:480px;">
+    <div class="modal-content"
+      style="background:var(--bg-panel);border:1px solid var(--border);color:var(--text);">
+
+      <!-- ── MODAL HEADER ── -->
+      <div class="modal-header"
+        style="border-bottom:1px solid var(--border);padding:12px 16px;">
+        <h6 class="modal-title mb-0" id="modalPageWatermarkLabel"
+          style="font-size:13px;font-weight:600;letter-spacing:.5px;">
+          <i class="bi bi-water me-2" style="color:var(--accent2);"></i>
+          Page Watermark
+        </h6>
+        <button type="button" class="btn-close btn-close-white btn-sm"
+          data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <!-- ── END MODAL HEADER ── -->
+
+      <!-- ── MODAL BODY ── -->
+      <div class="modal-body" style="padding:16px;display:flex;flex-direction:column;gap:16px;">
+
+
+        <!-- ────────────────────────────────────────
+             SECTION 1 — ENABLE WATERMARK TOGGLE
+             ──────────────────────────────────────── -->
+        <div class="d-flex align-items-center justify-content-between"
+          style="background:var(--bg-item);padding:10px 12px;border-radius:6px;border:1px solid var(--border);">
+          <span style="font-size:12px;font-weight:600;letter-spacing:.5px;">
+            <i class="bi bi-toggle-on me-2" style="color:var(--accent2);"></i>
+            Enable Watermark
+          </span>
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox"
+              id="watermark-enabled" role="switch"
+              style="cursor:pointer;width:36px;height:18px;">
+          </div>
+        </div>
+        <!-- ── END SECTION 1 ── -->
+
+
+        <!-- ────────────────────────────────────────
+             WATERMARK SETTINGS WRAPPER
+             (hidden when toggle is OFF)
+             ──────────────────────────────────────── -->
+        <div id="watermark-settings-wrapper"
+          style="display:none;flex-direction:column;gap:16px;">
+
+
+          <!-- ──────────────────────────────────────
+               SECTION 2 — PRESET / CUSTOM CHOICE
+               ────────────────────────────────────── -->
+          <div style="background:var(--bg-item);padding:12px;border-radius:6px;border:1px solid var(--border);">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+              color:var(--text-muted);margin-bottom:10px;">
+              Watermark Type
+            </div>
+
+            <!-- Type toggle — Preset or Custom -->
+            <div class="d-flex gap-2 mb-10" style="margin-bottom:10px;">
+
+              <label id="wm-type-preset-label"
+                style="flex:1;text-align:center;padding:6px 0;border-radius:4px;
+                border:2px solid var(--accent2);cursor:pointer;font-size:12px;">
+                <input type="radio" name="wm-type" id="wm-type-preset"
+                  value="preset" checked style="display:none;">
+                <i class="bi bi-collection me-1"></i> Preset
+              </label>
+
+              <label id="wm-type-custom-label"
+                style="flex:1;text-align:center;padding:6px 0;border-radius:4px;
+                border:2px solid var(--border);cursor:pointer;font-size:12px;">
+                <input type="radio" name="wm-type" id="wm-type-custom"
+                  value="custom" style="display:none;">
+                <i class="bi bi-pencil me-1"></i> Custom Text
+              </label>
+
+            </div>
+
+            <!-- Preset choices — shown when Preset is selected -->
+            <div id="wm-preset-choices">
+              <div class="d-flex gap-2 flex-wrap">
+
+                <button class="wm-preset-btn" data-preset="CONFIDENTIAL"
+                  style="padding:6px 12px;border-radius:4px;font-size:11px;font-weight:600;
+                  border:2px solid var(--accent2);background:var(--bg-panel);
+                  color:var(--text);cursor:pointer;letter-spacing:.5px;">
+                  Confidential
+                </button>
+
+                <button class="wm-preset-btn" data-preset="DRAFT"
+                  style="padding:6px 12px;border-radius:4px;font-size:11px;font-weight:600;
+                  border:2px solid var(--border);background:var(--bg-panel);
+                  color:var(--text);cursor:pointer;letter-spacing:.5px;">
+                  Draft
+                </button>
+
+                <button class="wm-preset-btn" data-preset="DO NOT COPY"
+                  style="padding:6px 12px;border-radius:4px;font-size:11px;font-weight:600;
+                  border:2px solid var(--border);background:var(--bg-panel);
+                  color:var(--text);cursor:pointer;letter-spacing:.5px;">
+                  Do Not Copy
+                </button>
+
+              </div>
+            </div>
+
+            <!-- Custom text input — shown when Custom is selected -->
+            <div id="wm-custom-input" style="display:none;">
+              <input
+                type="text"
+                id="watermark-custom-text"
+                class="form-control form-control-sm"
+                placeholder="Enter watermark text..."
+                maxlength="40"
+                style="background:var(--bg-panel);color:var(--text);
+                  border:1px solid var(--border);font-size:12px;"
+              />
+              <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">
+                Max 40 characters
+              </div>
+            </div>
+
+          </div>
+          <!-- ── END SECTION 2 ── -->
+
+
+          <!-- ──────────────────────────────────────
+               SECTION 3 — FORMATTING
+               ────────────────────────────────────── -->
+          <div style="background:var(--bg-item);padding:12px;border-radius:6px;border:1px solid var(--border);">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+              color:var(--text-muted);margin-bottom:10px;">
+              Formatting
+            </div>
+
+            <div class="d-flex gap-3 align-items-end flex-wrap">
+
+              <!-- Font Size -->
+              <div style="flex:1;min-width:80px;">
+                <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;">
+                  Font Size
+                </label>
+                <input
+                  type="number"
+                  id="watermark-font-size"
+                  class="form-control form-control-sm"
+                  value="72"
+                  min="20"
+                  max="200"
+                  style="background:var(--bg-panel);color:var(--text);
+                    border:1px solid var(--border);font-size:12px;"
+                />
+              </div>
+
+              <!-- Color Picker -->
+              <div style="flex:1;min-width:80px;">
+                <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;">
+                  Color
+                </label>
+                <div class="d-flex align-items-center gap-2">
+                  <input
+                    type="color"
+                    id="watermark-color"
+                    value="#ff0000"
+                    style="width:36px;height:32px;border:1px solid var(--border);
+                      border-radius:4px;padding:2px;cursor:pointer;
+                      background:var(--bg-panel);"
+                  />
+                  <span id="watermark-color-hex"
+                    style="font-size:11px;color:var(--text-muted);">
+                    #ff0000
+                  </span>
+                </div>
+              </div>
+
+              <!-- Text Case -->
+              <div style="flex:1;min-width:100px;">
+                <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;">
+                  Text Case
+                </label>
+                <select
+                  id="watermark-text-case"
+                  class="form-select form-select-sm"
+                  style="background:var(--bg-panel);color:var(--text);
+                    border:1px solid var(--border);font-size:12px;"
+                >
+                  <option value="uppercase">UPPERCASE</option>
+                  <option value="capitalize">Capitalize</option>
+                  <option value="lowercase">lowercase</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+          <!-- ── END SECTION 3 ── -->
+
+
+          <!-- ──────────────────────────────────────
+               SECTION 4 — LAYOUT
+               ────────────────────────────────────── -->
+          <div style="background:var(--bg-item);padding:12px;border-radius:6px;border:1px solid var(--border);">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+              color:var(--text-muted);margin-bottom:10px;">
+              Layout
+            </div>
+
+            <div class="d-flex gap-2">
+
+              <label id="wm-layout-diagonal-label"
+                style="flex:1;text-align:center;padding:8px 0;border-radius:4px;
+                border:2px solid var(--accent2);cursor:pointer;font-size:12px;">
+                <input type="radio" name="wm-layout" id="wm-layout-diagonal"
+                  value="diagonal" checked style="display:none;">
+                <i class="bi bi-arrow-up-right me-1"></i> Diagonal
+              </label>
+
+              <label id="wm-layout-horizontal-label"
+                style="flex:1;text-align:center;padding:8px 0;border-radius:4px;
+                border:2px solid var(--border);cursor:pointer;font-size:12px;">
+                <input type="radio" name="wm-layout" id="wm-layout-horizontal"
+                  value="horizontal" style="display:none;">
+                <i class="bi bi-arrows-expand me-1"></i> Horizontal
+              </label>
+
+            </div>
+          </div>
+          <!-- ── END SECTION 4 ── -->
+
+
+          <!-- ──────────────────────────────────────
+               SECTION 5 — APPLY TO
+               ────────────────────────────────────── -->
+          <div style="background:var(--bg-item);padding:12px;border-radius:6px;border:1px solid var(--border);">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
+              color:var(--text-muted);margin-bottom:10px;">
+              Apply To
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+
+              <label id="wm-scope-all-label"
+                style="flex:1;text-align:center;padding:6px 4px;border-radius:4px;
+                border:2px solid var(--accent2);cursor:pointer;font-size:11px;min-width:80px;">
+                <input type="radio" name="wm-scope" id="wm-scope-all"
+                  value="all" checked style="display:none;">
+                All Pages
+              </label>
+
+              <label id="wm-scope-except-first-label"
+                style="flex:1;text-align:center;padding:6px 4px;border-radius:4px;
+                border:2px solid var(--border);cursor:pointer;font-size:11px;min-width:80px;">
+                <input type="radio" name="wm-scope" id="wm-scope-except-first"
+                  value="except-first" style="display:none;">
+                All Except First
+              </label>
+
+              <label id="wm-scope-current-label"
+                style="flex:1;text-align:center;padding:6px 4px;border-radius:4px;
+                border:2px solid var(--border);cursor:pointer;font-size:11px;min-width:80px;">
+                <input type="radio" name="wm-scope" id="wm-scope-current"
+                  value="current" style="display:none;">
+                Current Page
+              </label>
+
+            </div>
+          </div>
+          <!-- ── END SECTION 5 ── -->
+
+
+        </div>
+        <!-- ── END WATERMARK SETTINGS WRAPPER ── -->
+
+
+      </div>
+      <!-- ── END MODAL BODY ── -->
+
+
+      <!-- ── MODAL FOOTER — ACTION BUTTONS ── -->
+      <div class="modal-footer"
+        style="border-top:1px solid var(--border);padding:10px 16px;
+        display:flex;justify-content:space-between;align-items:center;gap:8px;">
+
+        <!-- Left side: Remove buttons -->
+        <div class="d-flex gap-2">
+
+          <button type="button" id="btn-wm-remove-current"
+            class="btn btn-sm"
+            style="background:transparent;color:var(--text-muted);
+            border:1px solid var(--border);font-size:12px;">
+            <i class="bi bi-x-circle me-1"></i> Remove Page
+          </button>
+
+          <button type="button" id="btn-wm-remove-all"
+            class="btn btn-sm"
+            style="background:transparent;color:var(--accent);
+            border:1px solid var(--accent);font-size:12px;">
+            <i class="bi bi-trash3 me-1"></i> Remove All
+          </button>
+
+        </div>
+
+        <!-- Right side: Cancel + Apply -->
+        <div class="d-flex gap-2">
+
+          <button type="button" class="btn btn-sm"
+            data-bs-dismiss="modal"
+            style="background:var(--bg-item);color:var(--text);
+            border:1px solid var(--border);font-size:12px;">
+            Cancel
+          </button>
+
+          <button type="button" id="btn-wm-apply"
+            class="btn btn-sm"
+            style="background:var(--accent2);color:#000;border:none;font-size:12px;">
+            <i class="bi bi-check2 me-1"></i> Apply
+          </button>
+
+        </div>
+
+      </div>
+      <!-- ── END MODAL FOOTER ── -->
+
+
+    </div>
+  </div>
+</div>
+<!-- /#modal-page-watermark  END CHUNK 2 -->
+
+
 <!-- ═══════════════════════════════════════════════════════════════
   ▶ SCRIPT TAG TO ADD
   ─────────────────────────────────────────────────────────────────
@@ -3036,6 +3395,6 @@ document.getElementById('btn-add-placeholder').addEventListener('click', () => {
   <script src="page-style-numbering.js"></script>
   <script src="page-style-header.js"></script>
   <script src="page-style-footer.js"></script>
-  
+  <script src="page-style-watermark.js"></script>
 </body>
 </html>
