@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Document Template Builder{% endblock %}</title>
+  {% include 'css-links.html' %}
+</head>
+<body class="bg-dark text-light">
+
+  <nav class="navbar navbar-expand navbar-dark bg-black border-bottom border-secondary px-3">
+    <a class="navbar-brand fw-bold" href="{% url 'tb' %}">Template Builder</a>
+    <div class="ms-auto d-flex align-items-center gap-2">
+      {% if user.is_authenticated %}
+        <span class="text-secondary small">{{ user.username }}</span>
+        <form method="post" action="{% url 'logout' %}" class="mb-0">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-outline-light">Log out</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light">Log in</a>
+        <a href="{% url 'register' %}" class="btn btn-sm btn-danger">Sign up</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </div>
+
+  {% include 'js-links.html' %}
+</body>
+</html>

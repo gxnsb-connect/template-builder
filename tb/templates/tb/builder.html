@@ -1,0 +1,1394 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Document Template Builder</title>
+
+  {% include 'css-links.html' %}
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --bg-dark:    #1a1a2e;
+      --bg-panel:   #16213e;
+      --bg-item:    #0f3460;
+      --accent:     #e94560;
+      --accent2:    #4ecdc4;
+      --text:       #e0e0e0;
+      --text-muted: #8892a4;
+      --border:     #7a7a7a17;
+      --topbar-h:   48px;
+    }
+
+    html, body {
+      margin: 0; padding: 0;
+      height: 100%; width: 100%;
+      background: transparent !important;
+      color: var(--text);
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+    }
+
+    /* ── TOP BAR ── */
+    #topbar {
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 8px;
+    }
+
+    #topbar .brand {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: 1px;
+      margin-right: 8px;
+      text-transform: uppercase;
+    }
+
+    .sep {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+      margin: 0 4px;
+      flex-shrink: 0;
+    }
+
+    .tb-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .tb-btn:hover { background: var(--bg-item); color: var(--text); border-color: var(--border); }
+    .tb-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .tb-input {
+      background: var(--bg-item);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 12px;
+    }
+
+    .tb-select {
+      background: var(--bg-item);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .tb-label {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    #topbar-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+
+    /* ── SHARED PERSISTENT DROPDOWN (Page Layout, Page Border, ...) ── */
+    .pl-wrap { position: relative; }
+
+    .tb-menu {
+      display: none;               /* toggled by JS via .open */
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 6px;
+      min-width: 220px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      z-index: 300;
+      font-size: 12px;
+      color: var(--text);
+    }
+    .tb-menu.open { display: block; }
+
+    .pl-menu-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 12px;
+    }
+    .pl-menu-header button {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1;
+      padding: 2px;
+    }
+    .pl-menu-header button:hover { color: var(--accent); }
+
+    .pl-menu-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+
+    .pl-field { display: flex; flex-direction: column; gap: 3px; }
+    .pl-field select,
+    .pl-field input { width: 100%; }
+
+    .pl-section-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .pl-margin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    /* ── PAGE BORDER — tabs, controls + live preview ── */
+    #page-border-menu { min-width: 460px; }
+
+    .pb-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+    .pb-tab {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 11px;
+      padding: 7px 4px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all .15s;
+    }
+    .pb-tab:hover { color: var(--text); background: var(--bg-item); }
+    .pb-tab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+
+    .pb-tab-content { display: none; }
+    .pb-tab-content.active { display: flex; }
+
+    .pb-line-layout { display: flex; gap: 12px; padding: 10px; }
+    .pb-line-controls { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .pb-line-preview { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+
+    .pb-preview-page {
+      width: 90px;
+      height: 127px;              /* ~A4 ratio */
+      background: #262626;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .pb-preview-content {
+      position: absolute;
+      inset: 10px;
+      box-sizing: border-box;
+      transition: border-color .1s;
+    }
+
+    .pb-corner-grid {
+      display: grid;
+      grid-template-columns: repeat(5, auto);
+      gap: 4px 8px;
+      align-items: center;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .pb-corner-grid label { display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+
+    .pb-scope-row { display: flex; gap: 6px; }
+    .pb-scope-label {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      background: var(--bg-item);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .pb-scope-label:hover { border-color: var(--accent2); }
+
+    .pb-stub {
+      padding: 24px 10px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 12px;
+      width: 100%;
+    }
+
+    /* ── GRAPHIC BORDER — wider menu, icon grid, spacing preview ── */
+    .tb-menu.wide-graphic { min-width: 640px; }
+
+    .pb-graphic-layout { display: flex; gap: 12px; padding: 10px; }
+    .pb-graphic-controls { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .pb-graphic-preview { flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; max-width: 220px; }
+
+    .pb-icon-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      max-height: 120px;
+      overflow-y: auto;
+      padding: 2px;
+    }
+    .gb-icon-btn {
+      background: var(--bg-item);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px;
+      cursor: pointer;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color .15s;
+    }
+    .gb-icon-btn svg { width: 100%; height: 100%; display: block; }
+    .gb-icon-btn:hover { border-color: var(--accent2); }
+    .gb-icon-btn.selected { border-color: var(--accent2); box-shadow: 0 0 0 1px var(--accent2); }
+
+    .pb-preview-strip-wrap {
+      background: #262626;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      padding: 4px 0;
+    }
+    .pb-preview-strip {
+      position: relative;
+      height: 36px;
+    }
+
+
+    .top-nav {
+      height: 8vh !important;
+      padding: 1rem !important;
+      background-color: black !important;
+    }
+
+    /* ── LAYOUT ── */
+    #app {
+      position: fixed;
+      top: var(--topbar-h);
+      left: 0; right: 0; bottom: 0;
+      display: flex;
+    }
+
+    /* ── CENTER CANVAS ── */
+    #canvas-wrap { flex: 1; overflow: auto !important; position: relative; }
+    #gjs { width: 100%; height: 100%; background: transparent !important; }
+
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* ── GRAPES OVERRIDES — kill all default panels, blocks live elsewhere ── */
+    .gjs-pn-panels,
+    .gjs-pn-panel,
+    .gjs-pn-views,
+    .gjs-pn-views-container,
+    .gjs-pn-options,
+    .gjs-pn-commands {
+      display: none !important;
+      width: 0 !important;
+      min-width: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .gjs-editor,
+    .gjs-editor-cont { width: 100% !important; left: 0 !important; }
+
+    .gjs-cv-canvas {
+      width: 100% !important;
+      left: 0 !important;
+      right: 0 !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      background: #23233a !important;
+    }
+
+    .gjs-frame-wrapper__top,
+    .gjs-frame-wrapper__right,
+    .gjs-frame-wrapper__left,
+    .gjs-frame-wrapper__bottom {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    .gjs-frame-wrapper {
+      top: 0 !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+    }
+
+    body.landscape .gjs-frame-wrapper { min-width: 99vw !important; }
+  </style>
+</head>
+<body>
+  <nav class="navbar top-nav navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid d-block px-2 py-2 border">
+      <!-- TOP BAR — only the four kept features -->
+      <div id="topbar" class="w-100">
+        <span class="brand">DocBuilder</span>
+        <div class="sep"></div>
+
+        <!-- Page Layout — persistent dropdown: size, orientation, margin -->
+        <div class="pl-wrap">
+          <button class="tb-btn" id="btn-page-layout-toggle" title="Page Layout">
+            <i class="bi bi-file-earmark-ruled"></i> Page Layout
+          </button>
+
+          <div id="page-layout-menu" class="tb-menu">
+            <div class="pl-menu-header">
+              <span>Page Layout</span>
+              <button type="button" id="btn-close-page-layout"><i class="bi bi-x-lg"></i></button>
+            </div>
+
+            <div class="pl-menu-body">
+              <label class="pl-field">
+                <span class="tb-label">Page size</span>
+                <select id="page-size-select" class="tb-select">
+                  <option value="A0">A0</option>
+                  <option value="A1">A1</option>
+                  <option value="A2">A2</option>
+                  <option value="A3">A3</option>
+                  <option value="A4" selected>A4</option>
+                  <option value="A5">A5</option>
+                  <option value="A6">A6</option>
+                  <option value="A7">A7</option>
+                  <option value="A8">A8</option>
+                </select>
+              </label>
+
+              
+
+              <label class="pl-field">
+                <span class="tb-label">Orientation</span>
+                <select id="page-orientation-select" class="tb-select">
+                  <option value="portrait" selected>Portrait</option>
+                  <option value="landscape">Landscape</option>
+                </select>
+              </label>
+
+              <div class="pl-section-label">Page margin (mm)</div>
+              <div class="pl-margin-grid">
+                <label class="pl-field">
+                  <span class="tb-label">Top</span>
+                  <input id="page-margin-top" class="tb-input" type="number" min="0" value="10"/>
+                </label>
+                <label class="pl-field">
+                  <span class="tb-label">Right</span>
+                  <input id="page-margin-right" class="tb-input" type="number" min="0" value="10"/>
+                </label>
+                <label class="pl-field">
+                  <span class="tb-label">Bottom</span>
+                  <input id="page-margin-bottom" class="tb-input" type="number" min="0" value="10"/>
+                </label>
+                <label class="pl-field">
+                  <span class="tb-label">Left</span>
+                  <input id="page-margin-left" class="tb-input" type="number" min="0" value="10"/>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <!-- Page Border — persistent dropdown: Line Border (default) / Graphic Border -->
+        <div class="pl-wrap">
+          <button class="tb-btn" id="btn-page-border-toggle" title="Page Border">
+            <i class="bi bi-border-outer"></i> Page Border
+          </button>
+
+          <div id="page-border-menu" class="tb-menu">
+            <div class="pl-menu-header">
+              <span>Page Border</span>
+              <button type="button" id="btn-close-page-border"><i class="bi bi-x-lg"></i></button>
+            </div>
+
+            <div class="pb-tabs">
+              <button class="pb-tab active" data-target="pb-tab-line">Line Border</button>
+              <button class="pb-tab" data-target="pb-tab-graphic">Graphic Border</button>
+            </div>
+
+            <!-- ═══ LINE BORDER TAB (default, applies to .page-content) ═══ -->
+            <div class="pb-tab-content active" id="pb-tab-line">
+              <div class="pb-line-layout">
+
+                <div class="pb-line-controls">
+                  <label class="pl-field">
+                    <span class="tb-label">Border style</span>
+                    <!-- groove/ridge/outset/inset dropped — WeasyPrint doesn't render them -->
+                    <select id="lb-style" class="tb-select">
+                      <option value="solid" selected>Solid</option>
+                      <option value="dashed">Dashed</option>
+                      <option value="dotted">Dotted</option>
+                      <option value="double">Double</option>
+                    </select>
+                  </label>
+
+                  <div class="pl-margin-grid">
+                    <label class="pl-field">
+                      <span class="tb-label">Weight (mm)</span>
+                      <input id="lb-weight" class="tb-input" type="number" min="0" step="0.05" value="0.25"/>
+                    </label>
+                    <label class="pl-field">
+                      <span class="tb-label">Color</span>
+                      <input id="lb-color" class="tb-input" type="color" value="#000000"/>
+                    </label>
+                  </div>
+
+                  <div class="pl-section-label">Rounded corners</div>
+                  <div class="pb-corner-grid">
+                    <label><input type="checkbox" id="lb-corner-all"/> All</label>
+                    <label><input type="checkbox" id="lb-corner-tl"/> TL</label>
+                    <label><input type="checkbox" id="lb-corner-tr"/> TR</label>
+                    <label><input type="checkbox" id="lb-corner-br"/> BR</label>
+                    <label><input type="checkbox" id="lb-corner-bl"/> BL</label>
+                  </div>
+
+                  <label class="pl-field">
+                    <span class="tb-label">Corner radius (mm)</span>
+                    <input id="lb-radius" class="tb-input" type="number" min="0" step="0.05" value="0.25"/>
+                  </label>
+
+                  <div class="pl-section-label">Scope</div>
+                  <div class="pb-scope-row">
+                    <label class="pb-scope-label">
+                      <input type="radio" name="lb-scope" id="lb-scope-current" value="current" checked/>
+                      Current page
+                    </label>
+                    <label class="pb-scope-label">
+                      <input type="radio" name="lb-scope" id="lb-scope-all" value="all"/>
+                      All pages
+                    </label>
+                  </div>
+
+                  <button class="tb-btn" id="btn-apply-line-border" style="justify-content:center; border:1px solid var(--border); margin-top: 4px;">
+                    <i class="bi bi-check2"></i> Apply
+                  </button>
+                </div>
+
+                <div class="pb-line-preview">
+                  <span class="tb-label">Live preview</span>
+                  <div class="pb-preview-page">
+                    <div class="pb-preview-content" id="lb-preview-content"></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ═══ GRAPHIC BORDER TAB — SVG icons duplicated around .bdr bands ═══ -->
+            <div class="pb-tab-content" id="pb-tab-graphic">
+              <div class="pb-graphic-layout">
+
+                <div class="pb-graphic-controls">
+                  <div class="pl-section-label">Icon (border-tagged SVGs only)</div>
+                  <div class="pb-icon-grid" id="gb-icon-grid"></div>
+
+                  <label class="pl-field">
+                    <span class="tb-label">Fill color</span>
+                    <input id="gb-color" class="tb-input" type="color" value="#000000"/>
+                  </label>
+
+                  <label class="pl-field">
+                    <span class="tb-label">Size</span>
+                    <select id="gb-size" class="tb-select">
+                      <option value="Thin">Thin (3mm)</option>
+                      <option value="Small" selected>Small (5mm)</option>
+                      <option value="Medium">Medium (8mm)</option>
+                      <option value="Large">Large (12mm)</option>
+                      <option value="Big">Big (16mm)</option>
+                    </select>
+                  </label>
+
+                  <div class="pl-margin-grid">
+                    <label class="pl-field">
+                      <span class="tb-label">Icon gap (mm)</span>
+                      <input id="gb-gap" class="tb-input" type="number" min="0" step="0.1" value="0"/>
+                    </label>
+                    <label class="pl-field">
+                      <span class="tb-label">Fit</span>
+                      <select id="gb-fit" class="tb-select">
+                        <option value="fit" selected>Fit (even spacing)</option>
+                        <option value="overflow">Overflow (fixed step)</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <div class="pl-section-label">Scope</div>
+                  <div class="pb-scope-row">
+                    <label class="pb-scope-label">
+                      <input type="radio" name="gb-scope" id="gb-scope-current" value="current" checked/>
+                      Current page
+                    </label>
+                    <label class="pb-scope-label">
+                      <input type="radio" name="gb-scope" id="gb-scope-all" value="all"/>
+                      All pages
+                    </label>
+                  </div>
+
+                  <button class="tb-btn" id="btn-apply-graphic-border" style="justify-content:center; border:1px solid var(--border); margin-top: 4px;">
+                    <i class="bi bi-check2"></i> Apply
+                  </button>
+                </div>
+
+                <div class="pb-graphic-preview">
+                  <span class="tb-label">Live preview — top band, 100mm proxy length</span>
+                  <div class="pb-preview-strip-wrap">
+                    <div class="pb-preview-strip" id="gb-preview-strip"></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <!-- Add page -->
+        <button class="tb-btn" id="btn-add-page" title="Add Page">
+          <i class="bi bi-file-earmark-plus"></i> Add Page
+        </button>
+
+        <div id="topbar-right">
+          <!-- Export -->
+          <button class="tb-btn" id="btn-export"><i class="bi bi-download"></i> Export</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN LAYOUT -->
+  <div id="app">
+    <!-- CANVAS -->
+    <div id="canvas-wrap">
+      <div id="gjs"></div>
+    </div>
+  </div>
+
+  {% include 'js-links.html' %}
+
+  {{ svgs|json_script:"svg-data" }}
+
+  <script>
+
+    // ═══════════════════════════════════════════════════════
+    // PAGE SIZE REGISTRY (all values in mm)
+    // ═══════════════════════════════════════════════════════
+    const PAGE_SIZES = {
+      A0: { width: 841, height: 1189 },
+      A1: { width: 594, height: 841  },
+      A2: { width: 420, height: 594  },
+      A3: { width: 297, height: 420  },
+      A4: { width: 210, height: 297  },   // default
+      A5: { width: 148, height: 210  },
+      A6: { width: 105, height: 148  },
+      A7: { width: 74,  height: 105  },
+      A8: { width: 52,  height: 74   },
+    };
+
+    // ── PAGE CONFIG ──
+    // Layout reads left→right / top→bottom as:
+    //   [ margin | borderSize | contentPadding | content-area | contentPadding | borderSize | margin ]
+    // "Page margin" set in the Page Layout dropdown is applied as the
+    // OUTER edge of the border band (i.e. the border frame sits inset
+    // from the page edge by `margin`, and is `borderSize` thick).
+    const pageConfig = {
+      size:        'A4',        // key into PAGE_SIZES
+      orientation: 'portrait',  // 'portrait' | 'landscape' — swaps width/height when read
+      unit:        'mm',
+      margin:         { top: 10, right: 10, bottom: 10, left: 10 },  // page edge → border band, mm
+      borderSize:     0,   // thickness of the decorative border band, mm (all 4 sides equal for now)
+      contentPadding: 0,   // gutter between border band and content-area, mm
+    };
+
+    // ── RESOLVE ACTUAL DIMENSIONS FROM size + orientation ──
+    function getPageDimensions() {
+      const base = PAGE_SIZES[pageConfig.size] || PAGE_SIZES.A4;
+      const { width, height } = base;
+      return pageConfig.orientation === 'landscape'
+        ? { width: height, height: width }
+        : { width, height };
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // PAGE LAYOUT MATH — the single source of truth for every
+    // rectangle on the page. Everything else (CSS, export,
+    // future PDF math) should read geometry from here rather
+    // than recomputing it.
+    //
+    //   pageWidth / pageHeight    — full sheet, mm
+    //   margin.{top,right,bottom,left} — page edge → border band, mm
+    //   borderSize                — border band thickness, mm
+    //   contentPadding            — border band → content-area gutter, mm
+    //
+    // Returns mm numbers (not CSS strings) so callers can also
+    // use them for validation/export math, not just rendering.
+    // ═══════════════════════════════════════════════════════
+    function computePageLayout(config = pageConfig) {
+      const { width: pageWidth, height: pageHeight } = getPageDimensions();
+      const m  = config.margin;
+      const bs = config.borderSize;
+      const cp = config.contentPadding;
+
+      // ── Border frame — inset from the page edge by `margin` ──
+      const frame = {
+        top:    m.top,
+        left:   m.left,
+        width:  pageWidth  - m.left - m.right,
+        height: pageHeight - m.top  - m.bottom,
+      };
+
+      // ── Border bands — drawn along the 4 edges of the frame, `borderSize` thick ──
+      const bands = {
+        top:    { top: 0,                 left: 0,                 width: frame.width,               height: bs },
+        bottom: { top: frame.height - bs,  left: 0,                 width: frame.width,               height: bs },
+        left:   { top: bs,                 left: 0,                 width: bs,                         height: frame.height - 2 * bs },
+        right:  { top: bs,                 left: frame.width - bs,  width: bs,                         height: frame.height - 2 * bs },
+      };
+
+      // ── Content area — inset from the page edge by margin + borderSize + contentPadding ──
+      const inset = { top: m.top + bs + cp, right: m.right + bs + cp, bottom: m.bottom + bs + cp, left: m.left + bs + cp };
+      const content = {
+        top:    inset.top,
+        left:   inset.left,
+        width:  pageWidth  - inset.left - inset.right,
+        height: pageHeight - inset.top  - inset.bottom,
+      };
+
+      return { pageWidth, pageHeight, margin: m, borderSize: bs, contentPadding: cp, frame, bands, content };
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // EDITOR INIT
+    // blockManager still points at a container so blocks can
+    // be registered later (editor.Blocks.add(...)) — the block
+    // bar UI itself has been removed and will be rebuilt.
+    // ═══════════════════════════════════════════════════════
+    const editor = grapesjs.init({
+      container: '#gjs',
+      height: '100%',
+      width:  '100%',
+      storageManager: false,
+
+      blockManager:  { appendTo: null },   // no bar in this build; add UI + re-point when ready
+      panels:        { defaults: [] },
+    });
+
+    // ── PAGE SIZE SELECTOR ──
+    document.getElementById('page-size-select').addEventListener('change', (e) => {
+      pageConfig.size = e.target.value;
+      applyPageStyle();
+      editor.trigger('pageConfig:change');
+    });
+
+    // ── ORIENTATION SELECTOR (independent of size) ──
+    document.getElementById('page-orientation-select').addEventListener('change', (e) => {
+      const isLandscape = e.target.value === 'landscape';
+      pageConfig.orientation = e.target.value;
+
+      document.body.classList.toggle('landscape', isLandscape);
+
+      applyPageStyle();
+      editor.trigger('pageConfig:change');
+    });
+
+    // ── PAGE MARGIN INPUTS (applied as the border-band's outer edge) ──
+    function wireMarginInput(id, side) {
+      document.getElementById(id).addEventListener('input', (e) => {
+        const v = parseFloat(e.target.value);
+        pageConfig.margin[side] = Number.isFinite(v) && v >= 0 ? v : 0;
+        applyPageStyle();
+        editor.trigger('pageConfig:change');
+      });
+    }
+    wireMarginInput('page-margin-top',    'top');
+    wireMarginInput('page-margin-right',  'right');
+    wireMarginInput('page-margin-bottom', 'bottom');
+    wireMarginInput('page-margin-left',   'left');
+
+    // ── PAGE LAYOUT DROPDOWN — persistent, toggled open/closed ──
+    const pageLayoutMenu   = document.getElementById('page-layout-menu');
+    const pageLayoutToggle = document.getElementById('btn-page-layout-toggle');
+
+    pageLayoutToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      pageLayoutMenu.classList.toggle('open');
+    });
+    document.getElementById('btn-close-page-layout').addEventListener('click', (e) => {
+      e.stopPropagation();
+      pageLayoutMenu.classList.remove('open');
+    });
+    pageLayoutMenu.addEventListener('click', (e) => e.stopPropagation());
+
+    // ── PAGE BORDER DROPDOWN — persistent, toggled open/closed ──
+    const pageBorderMenu   = document.getElementById('page-border-menu');
+    const pageBorderToggle = document.getElementById('btn-page-border-toggle');
+
+    pageBorderToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      pageBorderMenu.classList.toggle('open');
+    });
+    document.getElementById('btn-close-page-border').addEventListener('click', (e) => {
+      e.stopPropagation();
+      pageBorderMenu.classList.remove('open');
+    });
+    pageBorderMenu.addEventListener('click', (e) => e.stopPropagation());
+
+    // ── PAGE BORDER — tab switching (Line Border / Graphic Border) ──
+    document.querySelectorAll('.pb-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.pb-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.pb-tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.target).classList.add('active');
+        // Graphic tab needs an icon grid + preview strip, so the menu grows
+        pageBorderMenu.classList.toggle('wide-graphic', tab.dataset.target === 'pb-tab-graphic');
+      });
+    });
+
+    // ═══════════════════════════════════════════════════════
+    // LINE BORDER — applied to .page-content (NOT .bdr — those
+    // bands belong to the Graphic Border tab, built further down).
+    //
+    //   lineBorderConfig  — the "apply to all pages" global state
+    //   pinnedBorderPages — page-content component ids that got a
+    //                       "current page" override; an #id rule
+    //                       always beats the .page-content class
+    //                       rule, so pinned pages are never touched
+    //                       by a later "apply to all".
+    // ═══════════════════════════════════════════════════════
+    const lineBorderConfig = {
+      style:  'solid',
+      weightMm: 0.25,
+      color:  '#000000',
+      corners: { all: false, tl: false, tr: false, br: false, bl: false },
+      radiusMm: 0.25,
+    };
+    let lineBorderApplied = false;          // false → .page-content keeps its debug orange outline
+    const pinnedBorderPages = new Set();    // component ids pinned via "current page"
+
+    // Reads the live form (not lineBorderConfig) — used by the preview
+    // and by Apply, so the preview always matches what Apply would do.
+    function readLineBorderForm() {
+      return {
+        style:  document.getElementById('lb-style').value,
+        weightMm: parseFloat(document.getElementById('lb-weight').value) || 0,
+        color:  document.getElementById('lb-color').value,
+        corners: {
+          all: document.getElementById('lb-corner-all').checked,
+          tl:  document.getElementById('lb-corner-tl').checked,
+          tr:  document.getElementById('lb-corner-tr').checked,
+          br:  document.getElementById('lb-corner-br').checked,
+          bl:  document.getElementById('lb-corner-bl').checked,
+        },
+        radiusMm: parseFloat(document.getElementById('lb-radius').value) || 0,
+      };
+    }
+
+    // Turns a line-border config into the CSS declarations for
+    // .page-content (or a pinned #id rule) — border + border-radius.
+    // border-radius order (TL TR BR BL) matches the checkbox order.
+    function buildLineBorderCSS(cfg) {
+      const c = cfg.corners;
+      const tl = (c.all || c.tl) ? cfg.radiusMm : 0;
+      const tr = (c.all || c.tr) ? cfg.radiusMm : 0;
+      const br = (c.all || c.br) ? cfg.radiusMm : 0;
+      const bl = (c.all || c.bl) ? cfg.radiusMm : 0;
+      return {
+        'border': `${cfg.weightMm}mm ${cfg.style} ${cfg.color}`,
+        'border-radius': `${tl}mm ${tr}mm ${br}mm ${bl}mm`,
+      };
+    }
+
+    // ── "All" corner checkbox — convenience: check/uncheck the four individually ──
+    document.getElementById('lb-corner-all').addEventListener('change', (e) => {
+      const on = e.target.checked;
+      ['tl', 'tr', 'br', 'bl'].forEach(k => { document.getElementById(`lb-corner-${k}`).checked = on; });
+      updateLineBorderPreview();
+    });
+
+    // ── LIVE PREVIEW — updates on every input, before Apply is pressed ──
+    function updateLineBorderPreview() {
+      const cfg = readLineBorderForm();
+      const decl = buildLineBorderCSS(cfg);
+      const el = document.getElementById('lb-preview-content');
+      el.style.border = decl.border;
+      el.style.borderRadius = decl['border-radius'];
+    }
+    ['lb-style', 'lb-weight', 'lb-color', 'lb-corner-tl', 'lb-corner-tr', 'lb-corner-br', 'lb-corner-bl', 'lb-radius']
+      .forEach(id => document.getElementById(id).addEventListener('input', updateLineBorderPreview));
+    updateLineBorderPreview(); // initial paint
+
+    // ── Finds the .page-content component "in focus" — the closest
+    // page ancestor of the current selection, falling back to the
+    // first page if nothing (or something outside a page) is selected. ──
+    function getCurrentPageContentComponent() {
+      const selected = editor.getSelected();
+      const pageComp = (selected && selected.closest && selected.closest('.page'))
+        || editor.getWrapper().components().filter(c => c.getClasses().includes('page'))[0];
+      if (!pageComp) return null;
+      return pageComp.components().filter(c => c.getClasses().includes('page-content'))[0] || null;
+    }
+
+    // ── APPLY ──
+    document.getElementById('btn-apply-line-border').addEventListener('click', () => {
+      const cfg = readLineBorderForm();
+      const scope = document.querySelector('input[name="lb-scope"]:checked').value;
+
+      if (scope === 'all') {
+        Object.assign(lineBorderConfig, cfg);
+        lineBorderApplied = true;
+        applyPageStyle();   // rebuilds .page-content class rule; pinned pages keep their #id override
+      } else {
+        const contentComp = getCurrentPageContentComponent();
+        if (!contentComp) {
+          console.warn('Line Border: no current page found to apply to.');
+          return;
+        }
+        const cid = contentComp.getId();
+        pinnedBorderPages.add(cid);
+        editor.Css.setRule(`#${cid}`, buildLineBorderCSS(cfg));
+      }
+    });
+
+    // ═══════════════════════════════════════════════════════
+    // GRAPHIC BORDER — SVG icons duplicated around the .bdr bands
+    // (top/bottom/left/right) inside .page-border-frame.
+    //
+    // SVG SOURCE: in production this array is the Django `svgs`
+    // context var (see read_svg_json_lib() / tb() in your view) —
+    //     const SVG_LIBRARY_RAW = {{ svgs|safe }};
+    // For this standalone build it's mocked below in the same
+    // shape your screenshot showed: entries keyed by `slot-id`
+    // (some libraries emit `slot` instead — normalizeSvgLibrary
+    // reads either), `supported_areas`, `fill`, and a `path` array.
+    // Only entries whose `supported_areas` includes "border" show
+    // up in the icon picker below.
+    //
+    // Fallback ONLY for entries with no viewBox of their own — every
+    // real library entry (svg_data.json) now carries its own, so this
+    // only fires for a malformed/incomplete future entry, not the norm.
+    const DEFAULT_VIEWBOX = '0 0 100 100';   // last-resort guess, not a real default
+
+    const SVG_LIBRARY_RAW = JSON.parse(document.getElementById('svg-data').textContent);
+
+    function normalizeSvgLibrary(raw) {
+      return raw
+        .map(entry => ({
+          slotId:         entry['slot-id'] || entry['slot'] || entry.slotId || '',
+          supportedAreas: entry.supported_areas || entry.supportedAreas || [],
+          fill:           entry.fill || 'currentColor',
+          paths:          entry.path || entry.paths || [],
+          viewBox:        entry.viewBox || DEFAULT_VIEWBOX,
+        }))
+        .filter(e => e.slotId && e.paths.length);
+    }
+
+    const SVG_LIBRARY  = normalizeSvgLibrary(SVG_LIBRARY_RAW);
+    const BORDER_SVGS  = SVG_LIBRARY.filter(e => e.supportedAreas.includes('border'));
+
+    const GB_SIZE_MM = { Thin: 3, Small: 5, Medium: 8, Large: 12, Big: 16 };
+
+    let selectedIconSlotId = null;
+
+    // ── INSTANCE TRACKING STORE ──
+    // One entry per icon actually placed on the page(s), in the shape
+    // from your screenshot: { slotId, instanceSlot, colorFill }. This
+    // is what next session's Django export will read to rebuild each
+    // instance with its own (possibly recolored) copy of the source SVG.
+    const borderInstanceData = [];
+
+    function uuid6() {
+      return Math.random().toString(36).slice(2, 8).padEnd(6, '0');
+    }
+
+    function pathsMarkup(entry, colorHex) {
+      return entry.paths.map(d => `<path d="${d}" fill="${colorHex}"/>`).join('');
+    }
+
+    // ── ICON PICKER ──
+    function renderIconGrid() {
+      const grid = document.getElementById('gb-icon-grid');
+      grid.innerHTML = '';
+
+      if (!BORDER_SVGS.length) {
+        grid.innerHTML = '<span class="tb-label">No SVGs tagged for the "border" area.</span>';
+        return;
+      }
+
+      BORDER_SVGS.forEach(entry => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'gb-icon-btn' + (entry.slotId === selectedIconSlotId ? ' selected' : '');
+        btn.title = entry.slotId;
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${entry.viewBox}">${pathsMarkup(entry, '#000000')}</svg>`;
+        btn.addEventListener('click', () => {
+          selectedIconSlotId = entry.slotId;
+          document.querySelectorAll('.gb-icon-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          updateGraphicPreview();
+        });
+        grid.appendChild(btn);
+      });
+
+      if (!selectedIconSlotId) selectedIconSlotId = BORDER_SVGS[0].slotId;
+    }
+
+    // ── SPACING MATH — shared by the live preview and the real apply.
+    // Returns start-offsets (mm) along the band's length axis for each
+    // icon instance.
+    //   fitMode 'fit'      → spacing stretches evenly so the row lands
+    //                        flush with both ends of the band.
+    //   fitMode 'overflow' → fixed icon+gap step; any leftover space
+    //                        at the end is left blank rather than resized.
+    // ═══════════════════════════════════════════════════════
+    function computeBandInstanceOffsets(lengthMm, iconMm, gapMm, fitMode) {
+      if (iconMm <= 0 || lengthMm <= 0) return [];
+      const step = iconMm + gapMm;
+      const count = Math.max(1, Math.floor((lengthMm + gapMm) / step));
+
+      let effectiveGap = gapMm;
+      if (fitMode === 'fit' && count > 1) {
+        effectiveGap = Math.max(0, (lengthMm - count * iconMm) / (count - 1));
+      }
+
+      const offsets = [];
+      for (let i = 0; i < count; i++) offsets.push(i * (iconMm + effectiveGap));
+      return offsets;
+    }
+
+    // ── LIVE PREVIEW — top band only, at a fixed 100mm proxy length ──
+    function updateGraphicPreview() {
+      const strip = document.getElementById('gb-preview-strip');
+      const entry = BORDER_SVGS.find(e => e.slotId === selectedIconSlotId);
+      if (!strip || !entry) { if (strip) strip.innerHTML = ''; return; }
+
+      const color   = document.getElementById('gb-color').value;
+      const sizeMm  = GB_SIZE_MM[document.getElementById('gb-size').value] || GB_SIZE_MM.Small;
+      const gapMm   = parseFloat(document.getElementById('gb-gap').value) || 0;
+      const fitMode = document.getElementById('gb-fit').value;
+
+      const previewLengthMm = 100;   // proxy length — not any real page's band
+      const pxPerMm = 2;
+
+      const offsets = computeBandInstanceOffsets(previewLengthMm, sizeMm, gapMm, fitMode);
+      strip.style.width = `${previewLengthMm * pxPerMm}px`;
+      strip.innerHTML = offsets.map(offsetMm => `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="${entry.viewBox}" style="position:absolute; left:${offsetMm * pxPerMm}px; top:0;
+             width:${sizeMm * pxPerMm}px; height:${sizeMm * pxPerMm}px;">${pathsMarkup(entry, color)}</svg>
+      `).join('');
+    }
+    ['gb-color', 'gb-size', 'gb-gap', 'gb-fit'].forEach(id =>
+      document.getElementById(id).addEventListener('input', updateGraphicPreview)
+    );
+
+    renderIconGrid();
+    updateGraphicPreview();
+
+    // ── PAGE / BAND LOOKUP ──
+    function getCurrentPageComponent() {
+      const selected = editor.getSelected();
+      return (selected && selected.closest && selected.closest('.page'))
+        || editor.getWrapper().components().filter(c => c.getClasses().includes('page'))[0]
+        || null;
+    }
+    function getAllPageComponents() {
+      return editor.getWrapper().components().filter(c => c.getClasses().includes('page'));
+    }
+
+    function clearBandInstances(bandComp) {
+      bandComp.components()
+        .filter(c => c.getAttributes()['data-instance-slot'])
+        .forEach(c => c.remove());
+    }
+
+    function buildInstanceSvgHtml(entry, sizeMm, colorHex, instanceSlot, axis, offsetMm) {
+      const posStyle = axis === 'x'
+        ? `left:${offsetMm}mm; top:50%; transform:translateY(-50%);`
+        : `top:${offsetMm}mm; left:50%; transform:translateX(-50%);`;
+      return `<svg xmlns="http://www.w3.org/2000/svg" data-instance-slot="${instanceSlot}" data-slot-id="${entry.slotId}"
+        class="bdr-icon-instance"
+        style="position:absolute; ${posStyle} width:${sizeMm}mm; height:${sizeMm}mm; overflow:visible;"
+        viewBox="${entry.viewBox}">${pathsMarkup(entry, colorHex)}</svg>`;
+    }
+
+    // ── APPLY GRAPHIC BORDER TO ONE PAGE — reads current global
+    // layout math (computePageLayout), fills all 4 bands, records
+    // each instance into borderInstanceData. ──
+    function applyGraphicBorderToPage(pageComp, cfg, entry) {
+      const frameComp = pageComp.components().filter(c => c.getClasses().includes('page-border-frame'))[0];
+      if (!frameComp) return;
+
+      const layout = computePageLayout();
+      const bandDefs = [
+        { cls: 'bdr-top',    axis: 'x', lengthMm: layout.bands.top.width    },
+        { cls: 'bdr-bottom', axis: 'x', lengthMm: layout.bands.bottom.width },
+        { cls: 'bdr-left',   axis: 'y', lengthMm: layout.bands.left.height  },
+        { cls: 'bdr-right',  axis: 'y', lengthMm: layout.bands.right.height },
+      ];
+
+      bandDefs.forEach(({ cls, axis, lengthMm }) => {
+        const bandComp = frameComp.components().filter(c => c.getClasses().includes(cls))[0];
+        if (!bandComp) return;
+
+        clearBandInstances(bandComp);
+
+        const offsets = computeBandInstanceOffsets(lengthMm, cfg.sizeMm, cfg.gapMm, cfg.fit);
+        offsets.forEach(offsetMm => {
+          const instanceSlot = uuid6();
+          bandComp.append(buildInstanceSvgHtml(entry, cfg.sizeMm, cfg.color, instanceSlot, axis, offsetMm));
+          borderInstanceData.push({ slotId: entry.slotId, instanceSlot, colorFill: cfg.color });
+        });
+      });
+    }
+
+    // ── APPLY ──
+    document.getElementById('btn-apply-graphic-border').addEventListener('click', () => {
+      const entry = BORDER_SVGS.find(e => e.slotId === selectedIconSlotId);
+      if (!entry) {
+        console.warn('Graphic Border: no icon selected.');
+        return;
+      }
+
+      const cfg = {
+        color: document.getElementById('gb-color').value,
+        sizeMm: GB_SIZE_MM[document.getElementById('gb-size').value] || GB_SIZE_MM.Small,
+        gapMm: parseFloat(document.getElementById('gb-gap').value) || 0,
+        fit: document.getElementById('gb-fit').value,
+      };
+      const scope = document.querySelector('input[name="gb-scope"]:checked').value;
+
+      // Border-band THICKNESS is still a single global value (pageConfig.borderSize,
+      // see computePageLayout from the Page Layout work) — there's no per-page
+      // border-thickness override yet, so sizing the band always affects every
+      // page's geometry. What scope actually controls is which page(s) get their
+      // bands FILLED with icon instances below.
+      pageConfig.borderSize = cfg.sizeMm + 0.5;
+      applyPageStyle();
+
+      const targets = scope === 'all' ? getAllPageComponents() : [getCurrentPageComponent()].filter(Boolean);
+      if (!targets.length) {
+        console.warn('Graphic Border: no page found to apply to.');
+        return;
+      }
+      targets.forEach(pageComp => applyGraphicBorderToPage(pageComp, cfg, entry));
+    });
+
+    // ═══════════════════════════════════════════════════════
+    // COMPONENT TYPES — page / page-content / page-border-frame.
+    // (page-header / page-footer types still removed along with
+    // those features — reintroduce them if those modules come back.)
+    // ═══════════════════════════════════════════════════════
+    editor.Components.addType('page', {
+      isComponent: el => el.classList && el.classList.contains('page'),
+      model: {
+        defaults: {
+          tagName: 'div',
+          attributes: { class: 'page' },
+          droppable: false,
+          draggable: false,
+          removable: false,
+          copyable: false,
+          selectable: false,
+          hoverable: false,
+        }
+      }
+    });
+
+    editor.Components.addType('page-content', {
+      isComponent: el => el.classList && el.classList.contains('page-content'),
+      model: {
+        defaults: {
+          tagName: 'div',
+          attributes: { class: 'page-content' },
+          droppable: true,
+          draggable: false,
+          removable: false,
+          copyable: false,
+          selectable: false,
+          hoverable: false,
+        }
+      }
+    });
+
+    // The border frame + its 4 bands (top/bottom/left/right). Bands are
+    // blank structural divs for now — decorative fill (asterisks, icon
+    // repeats, etc.) gets added later without touching this geometry.
+    editor.Components.addType('page-border-frame', {
+      isComponent: el => el.classList && el.classList.contains('page-border-frame'),
+      model: {
+        defaults: {
+          tagName: 'div',
+          attributes: { class: 'page-border-frame' },
+          droppable: false,
+          draggable: false,
+          removable: false,
+          copyable: false,
+          selectable: false,
+          hoverable: false,
+        }
+      }
+    });
+
+    // ═══════════════════════════════════════════════════════
+    // CANVAS + PAGE STYLE — reads geometry from computePageLayout()
+    // and turns it into the CSS injected into the canvas iframe as
+    // <style id="page-style">.
+    //
+    // DEBUG: .page-border-frame gets a primary-accent outline and
+    // .page-content gets an orange outline so the math is visually
+    // verifiable before any real border art or content goes in.
+    // ═══════════════════════════════════════════════════════
+    function buildPageCSS() {
+      const layout = computePageLayout();
+      const w = `${layout.pageWidth}mm`;
+      const h = `${layout.pageHeight}mm`;
+      const { frame, bands, content } = layout;
+
+      // Real line-border (once applied "to all pages") replaces the
+      // debug orange outline on .page-content; pinned per-page overrides
+      // still win via their higher-specificity #id rule regardless.
+      const contentBorderDecl = lineBorderApplied
+        ? buildLineBorderCSS(lineBorderConfig)
+        : { border: '1px solid orange', 'border-radius': '0' };  // DEBUG default
+
+      return `
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+        html, body {
+          margin: 0;
+          padding: 0;
+          background: #141414 !important;
+        }
+
+        body {
+          min-width: 100%;
+          padding: 60px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 30px;
+          box-sizing: border-box;
+          background: #2b2b3b;
+        }
+
+        /* ── PAGE — canvas preview, matches print exactly ── */
+        .page {
+          position: relative;
+          background: #262626;
+          width: ${w};
+          height: ${h};
+          box-sizing: border-box;
+          flex-shrink: 0;
+          overflow: hidden;
+          box-shadow: none !important;
+          border: 1px solid #7a7a7aff;
+          margin-bottom: 2rem !important;
+        }
+
+        /* ── BORDER FRAME — inset from page edge by margin, DEBUG outline ── */
+        .page-border-frame {
+          position: absolute;
+          top: ${frame.top}mm;
+          left: ${frame.left}mm;
+          width: ${frame.width}mm;
+          height: ${frame.height}mm;
+          box-sizing: border-box;
+          pointer-events: none;
+          z-index: 1;
+          border: 1px solid var(--accent2);   /* DEBUG — primary */
+        }
+
+        /* ── Border bands — thickness = borderSize, blank until filled ── */
+        .bdr {
+          position: absolute;
+          box-sizing: border-box;
+          overflow: hidden;
+        }
+        .bdr-top {
+          top: ${bands.top.top}mm; left: ${bands.top.left}mm;
+          width: ${bands.top.width}mm; height: ${bands.top.height}mm;
+        }
+        .bdr-bottom {
+          top: ${bands.bottom.top}mm; left: ${bands.bottom.left}mm;
+          width: ${bands.bottom.width}mm; height: ${bands.bottom.height}mm;
+        }
+        .bdr-left {
+          top: ${bands.left.top}mm; left: ${bands.left.left}mm;
+          width: ${bands.left.width}mm; height: ${bands.left.height}mm;
+        }
+        .bdr-right {
+          top: ${bands.right.top}mm; left: ${bands.right.left}mm;
+          width: ${bands.right.width}mm; height: ${bands.right.height}mm;
+        }
+        .bdr .rot {
+          display: block;
+          transform-origin: top left;
+        }
+
+        /* ── CONTENT ZONE — inset by margin + borderSize + contentPadding ── */
+        .page-content {
+          position: absolute;
+          top: ${content.top}mm;
+          left: ${content.left}mm;
+          width: ${content.width}mm;
+          height: ${content.height}mm;
+          overflow: hidden;
+          box-sizing: border-box;
+          z-index: 2;
+          border: ${contentBorderDecl.border};   ${lineBorderApplied ? '' : '/* DEBUG */'}
+          border-radius: ${contentBorderDecl['border-radius']};
+        }
+
+        .page.gjs-selected,
+        .page.gjs-hovered,
+        .page-border-frame.gjs-selected,
+        .page-border-frame.gjs-hovered,
+        .page-content.gjs-selected,
+        .page-content.gjs-hovered {
+          outline: none !important;
+          box-shadow: none !important;
+        }
+
+        /* ── PRINT — non-negotiable, always emitted ── */
+        @media print {
+          body {
+            padding: 0 !important;
+            margin: 0 !important;
+            background: #fff !important;
+            display: block !important;
+          }
+
+          @page {
+            size: ${w} ${h};
+            margin: 0;
+          }
+
+          .page {
+            width: ${w} !important;
+            height: ${h} !important;
+            box-sizing: border-box;
+            overflow: hidden;
+          }
+
+          /* Debug outlines are canvas-only aids — strip them on print.
+             .page-border-frame is always debug-only right now (graphic
+             border lands next session). .page-content keeps its border
+             in print once a real line border has been applied. */
+          .page-border-frame { border-color: transparent !important; }
+          ${lineBorderApplied ? '' : '.page-content { border-color: transparent !important; }'}
+        }
+      `;
+    }
+
+    function applyPageStyle() {
+      const wrapperComp = editor.getWrapper();
+      if (wrapperComp) {
+        wrapperComp.setStyle({
+          ...wrapperComp.getStyle(),
+          'background-color': '#111314ff !important;',
+          'gap': '40px',
+        });
+      }
+
+      const canvasDoc = editor.Canvas.getDocument();
+      if (!canvasDoc) return;
+
+      let styleTag = canvasDoc.getElementById('page-style');
+      if (!styleTag) {
+        styleTag = canvasDoc.createElement('style');
+        styleTag.id = 'page-style';
+        canvasDoc.head.appendChild(styleTag);
+      }
+      styleTag.innerHTML = buildPageCSS();
+    }
+
+    // ── PAGE MARKUP — page, border-frame (+ 4 blank bands), page-content.
+    // (header/footer markup removed with those modules; border art —
+    // asterisks, icon repeats, etc. — gets filled into the .bdr divs later,
+    // left blank here on purpose.) ──
+    function buildPageHTML() {
+      return `<div class="page" data-gjs-type="page">
+        <div class="page-border-frame" data-gjs-type="page-border-frame">
+          <div class="bdr bdr-top"></div>
+          <div class="bdr bdr-bottom"></div>
+          <div class="bdr bdr-left"><span class="rot"></span></div>
+          <div class="bdr bdr-right"><span class="rot"></span></div>
+        </div>
+        <div class="page-content" data-gjs-type="page-content"></div>
+      </div>`;
+    }
+
+    editor.on('load', () => {
+      editor.getWrapper().set('droppable', false); // disable drop on root wrapper
+      applyPageStyle();
+      editor.setComponents(buildPageHTML());
+    });
+
+    // ── ADD PAGE ──
+    document.getElementById('btn-add-page').addEventListener('click', () => {
+      editor.getWrapper().append(buildPageHTML());
+    });
+
+    // ═══════════════════════════════════════════════════════
+    // EXPORT — bundles editor HTML/CSS + the injected page-style
+    // tag into a single standalone .html file.
+    // (Other style-tag ids — header/footer/bg/numbering/watermark
+    //  — removed along with those modules; add their ids back to
+    //  styleTagIds below if/when reintroduced.)
+    // ═══════════════════════════════════════════════════════
+    document.getElementById('btn-export').addEventListener('click', () => {
+      const canvasDoc = editor.Canvas.getDocument();
+
+      const styleTagIds = ['page-style'];
+
+      const injectedCss = styleTagIds
+        .map(id => canvasDoc.getElementById(id)?.innerHTML || '')
+        .join('\n');
+
+      const html = editor.getHtml();
+      const css  = editor.getCss() + '\n' + injectedCss;
+
+      const blob = new Blob([`<style>${css}</style>${html}`], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'template.html';
+      a.click();
+    });
+
+  </script>
+</body>
+</html>
