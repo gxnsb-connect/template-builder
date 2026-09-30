@@ -347,6 +347,120 @@
     }
 
     body.landscape .gjs-frame-wrapper { min-width: 99vw !important; }
+
+    /* ═══════════════════════════════════════════════════════
+       FORMAT MENU ("curtain") — themed to this app's own palette.
+       Custom properties are scoped to .curtain (not :root) so they
+       shadow the app's --accent/--bg-* only inside the panel and
+       never leak out to the rest of the UI. --text/--text-muted are
+       left to inherit from :root as-is — same names, same values
+       already fit. --field-bg-hover has no existing app equivalent,
+       so it's a one-off, hand-picked lighter shade of --bg-item.
+       ═══════════════════════════════════════════════════════ */
+    .curtain {
+      --curtain-bg:      var(--bg-panel);
+      --field-bg:        var(--bg-item);
+      --field-bg-hover:  #154a82;
+      --border-c:        var(--border);
+      --accent:          var(--accent2);
+      --accent-strong:   var(--accent);
+      --tabs-bg:         var(--bg-dark);
+      --tabs-pill:       var(--bg-item);
+    }
+
+    /* ---- thin, consistent ("tallying") scrollbar used everywhere ---- */
+    .thin-scroll{scrollbar-width:thin;scrollbar-color:#3a4966 transparent}
+    .thin-scroll::-webkit-scrollbar{width:5px}
+    .thin-scroll::-webkit-scrollbar-track{background:transparent}
+    .thin-scroll::-webkit-scrollbar-thumb{background:#3a4966;border-radius:3px}
+    .thin-scroll::-webkit-scrollbar-thumb:hover{background:#4a5c80}
+
+    /* ---- Curtain panel: 75% height, 12.25% top/bottom, narrower width ---- */
+    .curtain{
+      position:fixed;top:12.25vh;bottom:12.25vh;left:16px;width:280px;max-width:86vw;
+      background:var(--curtain-bg);border:1px solid var(--border-c);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.5);
+      display:none;flex-direction:column;z-index:1000;overflow:hidden;
+    }
+    .curtain.show{display:flex}
+    .curtain-header{display:flex;align-items:center;justify-content:space-between;padding:.7rem .9rem;background:var(--curtain-bg);border-bottom:1px solid var(--border-c);z-index:2}
+    .curtain-header h6{margin:0;font-weight:600;font-size:.92rem;color:var(--text)}
+    .cx-close{background:none;border:0;color:var(--text-muted);font-size:1.05rem;line-height:1}
+    .cx-close:hover{color:#fff}
+
+    /* ---- tabs: pill segmented control ---- */
+    .tabs{display:flex;gap:3px;background:var(--tabs-bg);border:1px solid var(--border-c);border-radius:8px;padding:4px;margin:.6rem .7rem;z-index:2}
+    .tab-btn{flex:1;background:transparent;border:0;color:var(--text-muted);font-size:.66rem;font-weight:700;letter-spacing:.03em;
+      padding:.42rem .1rem;border-radius:6px}
+    .tab-btn.active{background:var(--tabs-pill);color:var(--accent)}
+    .tab-btn:hover:not(.active){color:var(--text)}
+
+    .tab-body{padding:.2rem .9rem .9rem;overflow-y:auto;overflow-x:hidden;position:relative;flex:1}
+
+    .grp-label{font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin:.85rem 0 .35rem}
+    .grp-label:first-child{margin-top:0}
+
+    .field-btn{width:100%;text-align:left;background:var(--field-bg);border:1px solid var(--border-c);color:var(--text);
+      border-radius:6px;padding:.4rem .6rem;font-size:.82rem;display:flex;align-items:center;justify-content:space-between}
+    .field-btn:hover{background:var(--field-bg-hover)}
+    .field-row{display:flex;gap:.5rem}
+    .field-row>*{flex:1;min-width:0}
+
+    .icon-toggle{background:var(--field-bg);border:1px solid var(--border-c);color:var(--text);border-radius:6px;
+      min-width:34px;height:32px;display:inline-flex;align-items:center;justify-content:center;font-size:.78rem;padding:0 .3rem}
+    .icon-toggle:hover{background:var(--field-bg-hover)}
+    .icon-toggle.active{background:var(--accent-strong);border-color:var(--accent-strong);color:#fff}
+    .icon-row{display:flex;flex-wrap:wrap;gap:.35rem}
+
+    .swatch-btn{width:34px;height:32px;border-radius:6px;border:1px solid var(--border-c);position:relative}
+    .swatch-under{position:absolute;left:0;right:0;bottom:0;height:4px;border-radius:0 0 5px 5px}
+
+    .grid-icons{display:grid;grid-template-columns:repeat(4,1fr);gap:.35rem}
+    .grid-icons .icon-toggle{width:100%}
+
+    input.mini-input{background:var(--field-bg);border:1px solid var(--border-c);color:var(--text);border-radius:6px;
+      padding:.35rem .5rem;font-size:.82rem;width:100%}
+    input.mini-input:focus{outline:2px solid var(--accent);outline-offset:0}
+    .suffix{font-size:.72rem;color:var(--text-muted);white-space:nowrap}
+
+    /* ---- generic absolute dropdown inside menu ---- */
+    .dd-panel{position:absolute;z-index:9500;background:var(--field-bg);border:1px solid var(--border-c);border-radius:8px;
+      box-shadow:0 10px 26px rgba(0,0,0,.55);max-height:180px;overflow-y:auto;display:none}
+    .dd-panel.dd-open{display:block}
+    .dd-item{padding:.45rem .7rem;font-size:.8rem;cursor:pointer;color:var(--text);white-space:nowrap}
+    .dd-item:hover{background:var(--field-bg-hover)}
+    .dd-item.selected{background:var(--accent-strong);color:#fff}
+
+    /* ---- custom popup system anchored strictly inside curtain ---- */
+    .cx-overlay{
+      position:absolute;inset:0;background:rgba(4,7,13,.75);z-index:8000;display:none;
+      align-items:center;justify-content:center;padding:.5rem;border-radius:10px;
+    }
+    .cx-overlay.cx-open{display:flex}
+    .cx-popup{
+      position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);
+      z-index:9000;background:var(--curtain-bg);border:1px solid var(--border-c);border-radius:10px;
+      width:calc(100% - 20px);max-height:85%;display:none;flex-direction:column;
+      box-shadow:0 16px 40px rgba(0,0,0,.6);overflow:hidden;
+    }
+    .cx-popup.cx-open{display:flex}
+    .cx-popup-head{display:flex;align-items:center;justify-content:space-between;padding:.6rem .75rem;background:var(--curtain-bg);border-bottom:1px solid var(--border-c)}
+    .cx-popup-head span{font-size:.82rem;font-weight:600}
+    .cx-popup-body{overflow-y:auto;padding:.5rem}
+
+    .font-item{padding:.42rem .55rem;border-radius:5px;font-size:.85rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;color:var(--text)}
+    .font-item:hover{background:var(--field-bg)}
+    .font-item.selected{background:var(--accent-strong)}
+    .size-item{padding:.32rem .7rem;border-radius:5px;font-size:.82rem;cursor:pointer;text-align:center;color:var(--text)}
+    .size-item:hover,.size-item.selected{background:var(--accent-strong)}
+
+    .cp-label{font-size:.7rem;color:var(--text-muted);margin:.4rem 0 .3rem}
+    .cp-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;margin-bottom:.3rem}
+    .cp-swatch{width:100%;aspect-ratio:1;border-radius:3px;border:1px solid rgba(255,255,255,.15);cursor:pointer}
+    .cp-more{font-size:.8rem;color:var(--accent);background:none;border:0;padding:.35rem 0;width:100%;text-align:left}
+    .cp-auto{font-size:.8rem;color:var(--accent);background:none;border:0;padding:.25rem 0;width:100%;text-align:left}
+
+    .hue-strip{height:14px;border-radius:7px;background:linear-gradient(to right,red,#ff0,#0f0,#0ff,#00f,#f0f,red);margin:.6rem 0;cursor:pointer}
+    .sv-box{height:100px;border-radius:6px;position:relative;cursor:crosshair}
   </style>
 </head>
 <body>
@@ -490,9 +604,14 @@
                     </label>
                   </div>
 
-                  <button class="tb-btn" id="btn-apply-line-border" style="justify-content:center; border:1px solid var(--border); margin-top: 4px;">
-                    <i class="bi bi-check2"></i> Apply
-                  </button>
+                  <div style="display:flex; gap:6px; margin-top:4px;">
+                    <button class="tb-btn" id="btn-apply-line-border" style="flex:1; justify-content:center; border:1px solid var(--border);">
+                      <i class="bi bi-check2"></i> Apply
+                    </button>
+                    <button class="tb-btn" id="btn-no-border-line" style="flex:1; justify-content:center; border:1px solid var(--border);">
+                      <i class="bi bi-slash-circle"></i> No border
+                    </button>
+                  </div>
                 </div>
 
                 <div class="pb-line-preview">
@@ -555,9 +674,14 @@
                     </label>
                   </div>
 
-                  <button class="tb-btn" id="btn-apply-graphic-border" style="justify-content:center; border:1px solid var(--border); margin-top: 4px;">
-                    <i class="bi bi-check2"></i> Apply
-                  </button>
+                  <div style="display:flex; gap:6px; margin-top:4px;">
+                    <button class="tb-btn" id="btn-apply-graphic-border" style="flex:1; justify-content:center; border:1px solid var(--border);">
+                      <i class="bi bi-check2"></i> Apply
+                    </button>
+                    <button class="tb-btn" id="btn-no-border-graphic" style="flex:1; justify-content:center; border:1px solid var(--border);">
+                      <i class="bi bi-slash-circle"></i> No border
+                    </button>
+                  </div>
                 </div>
 
                 <div class="pb-graphic-preview">
@@ -580,6 +704,11 @@
           <i class="bi bi-file-earmark-plus"></i> Add Page
         </button>
 
+        <!-- Add text -->
+        <button class="tb-btn" id="btn-add-text" title="Add Text">
+          <i class="bi bi-textarea-t"></i> Add Text
+        </button>
+
         <div id="topbar-right">
           <!-- Export -->
           <button class="tb-btn" id="btn-export"><i class="bi bi-download"></i> Export</button>
@@ -587,6 +716,439 @@
       </div>
     </div>
   </nav>
+
+  <!-- ═══════════════════════════════════════════════════════
+       FORMAT MENU — a themed panel used by canvas components that
+       need rich formatting controls. Opened contextually (e.g. by
+       the free-text box's own hover+focus trigger button, wired up
+       in the main editor script below) rather than a topbar button,
+       since it's meant to target whichever component asked for it.
+       ═══════════════════════════════════════════════════════ -->
+  <div class="curtain" id="curtain">
+    <div class="curtain-header">
+      <h6><i class="bi bi-fonts me-2"></i>Format Menu</h6>
+      <button class="cx-close" id="closeCurtain"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="font">FONT</button>
+      <button class="tab-btn" data-tab="para">PARAGRAPHING</button>
+      <button class="tab-btn" data-tab="lists">LISTS</button>
+      <button class="tab-btn" data-tab="border">BORDER</button>
+    </div>
+
+    <div class="tab-body thin-scroll" id="tabBody">
+
+      <!-- ===== FONT TAB ===== -->
+      <div class="tabpane" data-pane="font">
+        <div class="grp-label">Font Family</div>
+        <button class="field-btn" id="fontFamilyBtn"><span id="fontFamilyLabel">Source Sans Pro</span><i class="bi bi-chevron-down"></i></button>
+
+        <div class="field-row" style="margin-top:.7rem">
+          <div>
+            <div class="grp-label" style="margin-top:0">Font Size</div>
+            <button class="field-btn" id="fontSizeBtn"><span id="fontSizeLabel">12</span><i class="bi bi-chevron-down"></i></button>
+          </div>
+          <div>
+            <div class="grp-label" style="margin-top:0">Font Weight</div>
+            <button class="field-btn" id="fontWeightBtn"><span id="fontWeightLabel">400 · Regular</span><i class="bi bi-chevron-down"></i></button>
+          </div>
+        </div>
+
+        <div class="grp-label">Style</div>
+        <div class="icon-row">
+          <button class="icon-toggle" data-toggle title="Bold"><i class="bi bi-type-bold"></i></button>
+          <button class="icon-toggle" data-toggle title="Italic"><i class="bi bi-type-italic"></i></button>
+          <button class="icon-toggle" data-toggle title="Underline"><i class="bi bi-type-underline"></i></button>
+          <button class="icon-toggle" data-toggle title="Strikethrough"><i class="bi bi-type-strikethrough"></i></button>
+          <button class="icon-toggle" data-toggle title="Superscript"><i class="bi bi-superscript"></i></button>
+          <button class="icon-toggle" data-toggle title="Subscript"><i class="bi bi-subscript"></i></button>
+        </div>
+
+        <div class="grp-label">Change Case</div>
+        <div class="icon-row">
+          <button class="icon-toggle" data-toggle-radio="case" title="UPPERCASE">AA</button>
+          <button class="icon-toggle" data-toggle-radio="case" title="lowercase">aa</button>
+          <button class="icon-toggle" data-toggle-radio="case" title="Capitalize Each Word">Aa</button>
+          <button class="icon-toggle" data-toggle-radio="case" title="Sentence case">Aa.</button>
+        </div>
+
+        <div class="field-row" style="margin-top:.85rem">
+          <div>
+            <div class="grp-label" style="margin-top:0">Font Color</div>
+            <button class="swatch-btn" id="fontColorBtn" style="background:#e7ebf3"><span class="swatch-under" id="fontColorUnder" style="background:#e7ebf3"></span></button>
+          </div>
+          <div>
+            <div class="grp-label" style="margin-top:0">Highlight</div>
+            <button class="swatch-btn" id="hlColorBtn" style="background:#fff59d"><span class="swatch-under" id="hlColorUnder" style="background:#fff59d"></span></button>
+          </div>
+          <div>
+            <div class="grp-label" style="margin-top:0">Heading</div>
+            <button class="field-btn" id="headingBtn"><span id="headingLabel">Normal</span><i class="bi bi-chevron-down"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PARAGRAPHING TAB ===== -->
+      <div class="tabpane d-none" data-pane="para">
+        <div class="grp-label" style="margin-top:0">Style</div>
+        <button class="field-btn" id="paraStyleBtn"><span id="paraStyleLabel">Paragraph</span><i class="bi bi-chevron-down"></i></button>
+
+        <div class="grp-label">Alignment</div>
+        <div class="icon-row">
+          <button class="icon-toggle active" data-toggle-radio="align" title="Left"><i class="bi bi-text-left"></i></button>
+          <button class="icon-toggle" data-toggle-radio="align" title="Center"><i class="bi bi-text-center"></i></button>
+          <button class="icon-toggle" data-toggle-radio="align" title="Right"><i class="bi bi-text-right"></i></button>
+          <button class="icon-toggle" data-toggle-radio="align" title="Justify"><i class="bi bi-justify"></i></button>
+        </div>
+
+        <div class="field-row" style="margin-top:.85rem">
+          <div>
+            <div class="grp-label" style="margin-top:0">Line Spacing</div>
+            <button class="field-btn" id="lineSpaceBtn"><span id="lineSpaceLabel">1</span><i class="bi bi-chevron-down"></i></button>
+          </div>
+          <div>
+            <div class="grp-label" style="margin-top:0">Letter Spacing</div>
+            <div class="d-flex align-items-center gap-2">
+              <input type="number" class="mini-input" value="0" step="0.5"><span class="suffix">px</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grp-label">Indent</div>
+        <div class="icon-row">
+          <button class="icon-toggle" title="Decrease Indent"><i class="bi bi-text-indent-left"></i></button>
+          <button class="icon-toggle" title="Increase Indent"><i class="bi bi-text-indent-right"></i></button>
+        </div>
+
+        <div class="grp-label">Direction</div>
+        <div class="icon-row">
+          <button class="icon-toggle active" data-toggle-radio="dir" title="Left to Right"><i class="bi bi-arrow-right"></i></button>
+          <button class="icon-toggle" data-toggle-radio="dir" title="Right to Left"><i class="bi bi-arrow-left"></i></button>
+        </div>
+      </div>
+
+      <!-- ===== LISTS TAB ===== -->
+      <div class="tabpane d-none" data-pane="lists">
+        <div class="grp-label" style="margin-top:0">Bullets</div>
+        <div class="grid-icons" id="bulletGrid"></div>
+
+        <div class="grp-label">Numbering</div>
+        <div class="grid-icons" id="numberGrid"></div>
+
+        <div class="grp-label">Checklist</div>
+        <div class="grid-icons" id="checkGrid"></div>
+      </div>
+
+      <!-- ===== BORDER TAB ===== -->
+      <div class="tabpane d-none" data-pane="border">
+        <div class="grp-label" style="margin-top:0">Borders</div>
+        <div class="grid-icons">
+          <button class="icon-toggle" title="Outside Borders"><i class="bi bi-border-outer"></i></button>
+          <button class="icon-toggle" title="All Borders"><i class="bi bi-border-all"></i></button>
+          <button class="icon-toggle" title="Inside Borders"><i class="bi bi-border-inner"></i></button>
+          <button class="icon-toggle" title="Top Border"><i class="bi bi-border-top"></i></button>
+          <button class="icon-toggle" title="Bottom Border"><i class="bi bi-border-bottom"></i></button>
+          <button class="icon-toggle" title="Left Border"><i class="bi bi-border-left"></i></button>
+          <button class="icon-toggle" title="Right Border"><i class="bi bi-border-right"></i></button>
+          <button class="icon-toggle" title="No Border"><i class="bi bi-x-square"></i></button>
+        </div>
+
+        <div class="field-row" style="margin-top:.85rem">
+          <div>
+            <div class="grp-label" style="margin-top:0">Border Weight</div>
+            <div class="d-flex align-items-center gap-2"><input type="number" class="mini-input" value="1" min="0"><span class="suffix">px</span></div>
+          </div>
+          <div>
+            <div class="grp-label" style="margin-top:0">Border Style</div>
+            <button class="field-btn" id="borderStyleBtn"><span id="borderStyleLabel">Solid</span><i class="bi bi-chevron-down"></i></button>
+          </div>
+        </div>
+
+        <div class="field-row" style="margin-top:.85rem">
+          <div>
+            <div class="grp-label" style="margin-top:0">Border Color</div>
+            <button class="swatch-btn" id="borderColorBtn" style="background:#2f5496"><span class="swatch-under" id="borderColorUnder" style="background:#2f5496"></span></button>
+          </div>
+          <div>
+            <div class="grp-label" style="margin-top:0">Border Padding</div>
+            <div class="d-flex align-items-center gap-2"><input type="number" class="mini-input" value="4" min="0"><span class="suffix">px</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== INSIDE MENU POPUP OVERLAY SYSTEM ===== -->
+    <div class="cx-overlay" id="cxOverlay"></div>
+
+    <div class="cx-popup" id="popFontFamily">
+      <div class="cx-popup-head"><span>Font Family</span><button class="cx-close" data-close><i class="bi bi-x-lg"></i></button></div>
+      <div class="cx-popup-body thin-scroll">
+        <input class="mini-input mb-2" id="fontSearch" placeholder="Search font">
+        <div id="fontList"></div>
+      </div>
+    </div>
+
+    <div class="cx-popup" id="popFontSize">
+      <div class="cx-popup-head"><span>Font Size</span><button class="cx-close" data-close><i class="bi bi-x-lg"></i></button></div>
+      <div class="cx-popup-body thin-scroll">
+        <input type="number" class="mini-input mb-2" id="customSizeInput" placeholder="Custom value">
+        <div id="sizeList"></div>
+      </div>
+    </div>
+
+    <div class="cx-popup" id="popLineSpacing">
+      <div class="cx-popup-head"><span>Line Spacing</span><button class="cx-close" data-close><i class="bi bi-x-lg"></i></button></div>
+      <div class="cx-popup-body thin-scroll" id="lineList"></div>
+    </div>
+
+    <div class="cx-popup" id="popFontColor">
+      <div class="cx-popup-head"><span id="fontColorTitle">Font Color</span><button class="cx-close" data-close><i class="bi bi-x-lg"></i></button></div>
+      <div class="cx-popup-body thin-scroll" id="fontColorBody"></div>
+    </div>
+
+    <div class="cx-popup" id="popHlColor">
+      <div class="cx-popup-head"><span id="hlColorTitle">Highlight Color</span><button class="cx-close" data-close><i class="bi bi-x-lg"></i></button></div>
+      <div class="cx-popup-body thin-scroll" id="hlColorBody"></div>
+    </div>
+
+    <div class="cx-popup" id="popBorderColor">
+      <div class="cx-popup-head"><span id="borderColorTitle">Border Color</span><button class="cx-close" data-close><i class="bi bi-x-lg"></i></button></div>
+      <div class="cx-popup-body thin-scroll" id="borderColorBody"></div>
+    </div>
+
+    <!-- generic dropdown placed internally within menu -->
+    <div class="dd-panel" id="ddPanel"></div>
+  </div>
+
+  <script>
+  // ═══════════════════════════════════════════════════════
+  // FORMAT MENU — self-contained panel UI (tabs, popups, color
+  // pickers). Opening/closing and which component it targets is
+  // driven from the main editor script further down (the free-text
+  // hover+focus trigger); this block only runs the panel's own
+  // internal controls once it's open.
+  // ═══════════════════════════════════════════════════════
+  (function () {
+    // ---------- data ----------
+    const fonts = ["Sonsie One","Sora","Sorts Mill Goudy","Sour Gummy","Source Code Pro","Source Sans 3",
+    "Source Sans Pro","Source Serif 4","Space Grotesk","Space Mono","Special Elite","Special Gothic",
+    "Arial","Georgia","Times New Roman","Verdana","Tahoma","Trebuchet MS","Roboto","Open Sans",
+    "Lato","Montserrat","Poppins","Inter","Merriweather","Playfair Display","Nunito","Raleway","Oswald","PT Sans"];
+    let selectedFont = "Source Sans Pro";
+    const sizes = [8,9,10,11,12,14,16,18,20,24,26,28,36,48,72];
+    let selectedSize = 12;
+    const lineSpacings = [1,1.15,1.5,2,2.5,3];
+    const weights = ["100 · Thin","200 · Extra Light","300 · Light","400 · Regular","500 · Medium","600 · Semi Bold","700 · Bold","800 · Extra Bold"];
+    const headings = ["Normal","H1","H2","H3","H4","H5","H6"];
+    const paraStyles = ["Paragraph","H1","H2","H3"];
+    const borderStyles = ["Solid","Dashed","Dotted","Double"];
+
+    const grayRow = ["#ffffff","#000000","#e7e6e6","#44546a","#ed7d31","#a5a5a5","#ffc000","#5b9bd5"];
+    const colorRows = [
+    ["#d9d9d9","#808080","#595959","#8eaadb","#f4b183","#b4c6e7","#fbe5d6","#ffe699"],
+    ["#bfbfbf","#666666","#404040","#6f9bd1","#ed7d31","#9dc3e6","#f8cbad","#ffd966"],
+    ["#a6a6a6","#3f3f3f","#262626","#2e5496","#c65911","#2e74b5","#f4b183","#bf9000"],
+    ["#7f7f7f","#262626","#0d0d0d","#1f3864","#833c00","#1f4e79","#c55a11","#7f6000"]];
+    const standardColors = ["#ff0000","#ffc000","#ffff00","#92d050","#00b050","#00b0f0","#0070c0","#7030a0"];
+
+    const bulletIcons = ["bi-circle-fill","bi-circle","bi-square-fill","bi-dash-lg","bi-caret-right-fill","bi-diamond-fill","bi-star-fill","bi-check2"];
+    const numberFormats = ["1.","a.","A.","i.","I.","1)","(1)","01."];
+    const checkIcons = ["bi-square","bi-check-square","bi-check-circle","bi-record-circle","bi-pencil","bi-star","bi-x-square","bi-flag"];
+
+    const curtain = document.getElementById('curtain');
+
+    // ---------- curtain open/close ----------
+    // (Opening is driven contextually by the main editor script — see
+    // the free-text format-menu trigger — this only wires the close
+    // button, which is generic regardless of what opened the panel.)
+    document.getElementById('closeCurtain').onclick = ()=> curtain.classList.remove('show');
+
+    // ---------- tabs ----------
+    document.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.onclick = ()=>{
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.tabpane').forEach(p=>p.classList.add('d-none'));
+        document.querySelector(`.tabpane[data-pane="${btn.dataset.tab}"]`).classList.remove('d-none');
+      };
+    });
+
+    // ---------- toggle buttons ----------
+    document.querySelectorAll('[data-toggle]').forEach(b=> b.onclick = ()=> b.classList.toggle('active'));
+    document.querySelectorAll('[data-toggle-radio]').forEach(b=>{
+      b.onclick = ()=>{
+        const group = b.dataset.toggleRadio;
+        document.querySelectorAll(`[data-toggle-radio="${group}"]`).forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+      };
+    });
+
+    // ---------- generic dropdown bounded inside menu ----------
+    const ddPanel = document.getElementById('ddPanel');
+    function openDropdown(triggerEl, options, selected, onSelect){
+      ddPanel.innerHTML = options.map(o=>`<div class="dd-item${o===selected?' selected':''}">${o}</div>`).join('');
+      const r = triggerEl.getBoundingClientRect();
+      const curtainRect = curtain.getBoundingClientRect();
+
+      ddPanel.style.width = r.width+'px';
+      ddPanel.style.left = (r.left - curtainRect.left)+'px';
+
+      let top = (r.bottom - curtainRect.top) + 2;
+      if(top + 180 > curtainRect.height) {
+        top = (r.top - curtainRect.top) - 184;
+      }
+      ddPanel.style.top = top+'px';
+      ddPanel.classList.add('dd-open');
+      [...ddPanel.children].forEach((it,i)=> it.onclick = (e)=>{ e.stopPropagation(); onSelect(options[i]); ddPanel.classList.remove('dd-open'); });
+    }
+    document.addEventListener('click', e=>{
+      if(!e.target.closest('.dd-panel') && !e.target.closest('#fontWeightBtn') && !e.target.closest('#headingBtn') &&
+         !e.target.closest('#paraStyleBtn') && !e.target.closest('#borderStyleBtn')) ddPanel.classList.remove('dd-open');
+    });
+    document.getElementById('fontWeightBtn').onclick = e=>{ e.stopPropagation(); openDropdown(e.currentTarget, weights, document.getElementById('fontWeightLabel').textContent, v=> document.getElementById('fontWeightLabel').textContent=v); };
+    document.getElementById('headingBtn').onclick = e=>{ e.stopPropagation(); openDropdown(e.currentTarget, headings, document.getElementById('headingLabel').textContent, v=> document.getElementById('headingLabel').textContent=v); };
+    document.getElementById('paraStyleBtn').onclick = e=>{ e.stopPropagation(); openDropdown(e.currentTarget, paraStyles, document.getElementById('paraStyleLabel').textContent, v=> document.getElementById('paraStyleLabel').textContent=v); };
+    document.getElementById('borderStyleBtn').onclick = e=>{ e.stopPropagation(); openDropdown(e.currentTarget, borderStyles, document.getElementById('borderStyleLabel').textContent, v=> document.getElementById('borderStyleLabel').textContent=v); };
+
+    // ---------- custom popup system (nested in curtain) ----------
+    const cxOverlay = document.getElementById('cxOverlay');
+    const allPopups = ['popFontFamily','popFontSize','popLineSpacing','popFontColor','popHlColor','popBorderColor'].map(id=>document.getElementById(id));
+    function closeAllPopups(){ allPopups.forEach(p=>p.classList.remove('cx-open')); cxOverlay.classList.remove('cx-open'); }
+    function openPopup(id){ closeAllPopups(); document.getElementById(id).classList.add('cx-open'); cxOverlay.classList.add('cx-open'); }
+    cxOverlay.onclick = closeAllPopups;
+    document.querySelectorAll('[data-close]').forEach(b=> b.onclick = closeAllPopups);
+
+    // ---- font family popup ----
+    const fontSearch = document.getElementById('fontSearch');
+    const fontListEl = document.getElementById('fontList');
+    function renderFonts(filter=""){
+      fontListEl.innerHTML="";
+      fonts.filter(f=>f.toLowerCase().includes(filter.toLowerCase())).forEach(f=>{
+        const d=document.createElement('div');
+        d.className='font-item'+(f===selectedFont?' selected':'');
+        d.style.fontFamily=f;
+        d.innerHTML = f + (f===selectedFont?' <i class="bi bi-check-lg"></i>':'');
+        d.onclick=()=>{ selectedFont=f; document.getElementById('fontFamilyLabel').textContent=f; closeAllPopups(); };
+        fontListEl.appendChild(d);
+      });
+    }
+    document.getElementById('fontFamilyBtn').onclick = ()=>{ renderFonts(); fontSearch.value=''; openPopup('popFontFamily'); };
+    fontSearch.oninput = e=> renderFonts(e.target.value);
+
+    // ---- font size popup ----
+    const sizeList = document.getElementById('sizeList');
+    sizes.forEach(s=>{
+      const d=document.createElement('div'); d.className='size-item'; d.textContent=s;
+      d.onclick=()=>{ selectedSize=s; document.getElementById('fontSizeLabel').textContent=s; closeAllPopups(); };
+      sizeList.appendChild(d);
+    });
+    document.getElementById('fontSizeBtn').onclick = ()=> openPopup('popFontSize');
+    document.getElementById('customSizeInput').onkeydown = e=>{
+      if(e.key==='Enter' && e.target.value){ selectedSize=e.target.value; document.getElementById('fontSizeLabel').textContent=e.target.value; closeAllPopups(); }
+    };
+
+    // ---- line spacing popup ----
+    const lineList = document.getElementById('lineList');
+    lineSpacings.forEach(v=>{
+      const d=document.createElement('div'); d.className='size-item'; d.textContent=v;
+      d.onclick=()=>{ document.getElementById('lineSpaceLabel').textContent=v; closeAllPopups(); };
+      lineList.appendChild(d);
+    });
+    document.getElementById('lineSpaceBtn').onclick = ()=> openPopup('popLineSpacing');
+
+    // ---- color popups ----
+    function setSwatch(btnId, underId, color){
+      document.getElementById(btnId).style.background = color;
+      document.getElementById(underId).style.background = color;
+    }
+    function renderColorGrid(bodyEl, btnId, underId, titleEl, baseTitle, popupId){
+      bodyEl.innerHTML = '<div class="cp-label">High-contrast only</div>';
+      const autoBtn = document.createElement('button'); autoBtn.className='cp-auto'; autoBtn.innerHTML='<i class="bi bi-slash-circle me-1"></i>Automatic';
+      autoBtn.onclick=()=>{ setSwatch(btnId,underId,'#e7ebf3'); closeAllPopups(); };
+      bodyEl.appendChild(autoBtn);
+      [grayRow, ...colorRows].forEach(row=>{
+        const g=document.createElement('div'); g.className='cp-grid';
+        row.forEach(c=>{ const sw=document.createElement('div'); sw.className='cp-swatch'; sw.style.background=c;
+          sw.onclick=()=>{ setSwatch(btnId,underId,c); closeAllPopups(); }; g.appendChild(sw); });
+        bodyEl.appendChild(g);
+      });
+      const lbl=document.createElement('div'); lbl.className='cp-label'; lbl.textContent='Standard Colors'; bodyEl.appendChild(lbl);
+      const g2=document.createElement('div'); g2.className='cp-grid';
+      standardColors.forEach(c=>{ const sw=document.createElement('div'); sw.className='cp-swatch'; sw.style.background=c;
+        sw.onclick=()=>{ setSwatch(btnId,underId,c); closeAllPopups(); }; g2.appendChild(sw); });
+      bodyEl.appendChild(g2);
+      const more=document.createElement('button'); more.className='cp-more'; more.innerHTML='<i class="bi bi-palette me-1"></i>More Colors';
+      more.onclick=()=>{ titleEl.textContent='Custom Colors'; renderCustomColor(bodyEl, btnId, underId, titleEl, baseTitle); };
+      bodyEl.appendChild(more);
+    }
+    function hexToRgb(h){ h=h.replace('#',''); const n=parseInt(h,16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+    function rgbToHex(r,g,b){ return [r,g,b].map(x=>(+x).toString(16).padStart(2,'0')).join(''); }
+    function hslToHex(h,s,l){ s/=100; l/=100; const k=n=>(n+h/30)%12, a=s*Math.min(l,1-l);
+      const f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));
+      return rgbToHex(Math.round(255*f(0)),Math.round(255*f(8)),Math.round(255*f(4))); }
+    function renderCustomColor(bodyEl, btnId, underId, titleEl, baseTitle){
+      bodyEl.innerHTML = `
+        <div class="sv-box mb-2" id="svBox_${btnId}" style="background:linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,#2f5496)">
+          <div style="position:absolute;width:14px;height:14px;border:2px solid #fff;border-radius:50%;left:80%;top:30%;transform:translate(-50%,-50%)"></div>
+        </div>
+        <div class="hue-strip" id="hue_${btnId}"></div>
+        <div class="row g-2 mt-1 text-center">
+          <div class="col-6"><label class="suffix d-block">Hex</label><input class="mini-input text-center" id="hex_${btnId}" value="2f5496"></div>
+          <div class="col-2"><label class="suffix d-block">R</label><input class="mini-input text-center" id="r_${btnId}" value="47"></div>
+          <div class="col-2"><label class="suffix d-block">G</label><input class="mini-input text-center" id="g_${btnId}" value="84"></div>
+          <div class="col-2"><label class="suffix d-block">B</label><input class="mini-input text-center" id="b_${btnId}" value="150"></div>
+        </div>
+        <div class="d-flex gap-2 mt-3">
+          <button class="field-btn text-center" style="background:var(--accent-strong)" id="ok_${btnId}">OK</button>
+          <button class="field-btn text-center" id="back_${btnId}">Back</button>
+        </div>`;
+      const hueStrip = document.getElementById('hue_'+btnId), svBox = document.getElementById('svBox_'+btnId);
+      hueStrip.onclick = e=>{
+        const r=hueStrip.getBoundingClientRect(); const pct=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width));
+        const hex = hslToHex(Math.round(pct*360),70,50);
+        svBox.style.background = `linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,#${hex})`;
+      };
+      document.getElementById('hex_'+btnId).oninput = e=>{
+        const [r,g,b]=hexToRgb(e.target.value);
+        document.getElementById('r_'+btnId).value=r; document.getElementById('g_'+btnId).value=g; document.getElementById('b_'+btnId).value=b;
+      };
+      ['r_','g_','b_'].forEach(p=> document.getElementById(p+btnId).oninput = ()=>{
+        document.getElementById('hex_'+btnId).value = rgbToHex(document.getElementById('r_'+btnId).value, document.getElementById('g_'+btnId).value, document.getElementById('b_'+btnId).value);
+      });
+      document.getElementById('ok_'+btnId).onclick = ()=>{ setSwatch(btnId, underId, '#'+document.getElementById('hex_'+btnId).value); closeAllPopups(); };
+      document.getElementById('back_'+btnId).onclick = ()=>{ titleEl.textContent=baseTitle; renderColorGrid(bodyEl, btnId, underId, titleEl, baseTitle); };
+    }
+    document.getElementById('fontColorBtn').onclick = ()=>{
+      document.getElementById('fontColorTitle').textContent='Font Color';
+      renderColorGrid(document.getElementById('fontColorBody'),'fontColorBtn','fontColorUnder',document.getElementById('fontColorTitle'),'Font Color');
+      openPopup('popFontColor');
+    };
+    document.getElementById('hlColorBtn').onclick = ()=>{
+      document.getElementById('hlColorTitle').textContent='Highlight Color';
+      renderColorGrid(document.getElementById('hlColorBody'),'hlColorBtn','hlColorUnder',document.getElementById('hlColorTitle'),'Highlight Color');
+      openPopup('popHlColor');
+    };
+    document.getElementById('borderColorBtn').onclick = ()=>{
+      document.getElementById('borderColorTitle').textContent='Border Color';
+      renderColorGrid(document.getElementById('borderColorBody'),'borderColorBtn','borderColorUnder',document.getElementById('borderColorTitle'),'Border Color');
+      openPopup('popBorderColor');
+    };
+
+    // ---------- lists tab icon grids ----------
+    function fillGrid(id, icons){
+      const g = document.getElementById(id);
+      icons.forEach(ic=>{
+        const b=document.createElement('button'); b.className='icon-toggle'; b.innerHTML=`<i class="bi ${ic}"></i>`;
+        b.onclick=()=> b.classList.toggle('active'); g.appendChild(b);
+      });
+    }
+    fillGrid('bulletGrid', bulletIcons);
+    document.getElementById('numberGrid').innerHTML = numberFormats.map(f=>`<button class="icon-toggle" style="font-size:.72rem;font-weight:700">${f}</button>`).join('');
+    document.querySelectorAll('#numberGrid .icon-toggle').forEach(b=> b.onclick=()=> b.classList.toggle('active'));
+    fillGrid('checkGrid', checkIcons);
+  })();
+  </script>
 
   <!-- MAIN LAYOUT -->
   <div id="app">
@@ -703,12 +1265,33 @@
 
       blockManager:  { appendTo: null },   // no bar in this build; add UI + re-point when ready
       panels:        { defaults: [] },
+
+      // PlainDraggable (github.com/anseki/plain-draggable) drives the
+      // free-text box's whole-box move (see the free-text component's
+      // view below) — GrapesJS's own absolute-drag has version-specific
+      // internal assumptions (unit parsing, native HTML5 DnD side
+      // effects) that kept fighting us. `canvas.scripts` loads it
+      // straight into the canvas iframe's own document/window, which is
+      // where the draggable elements actually live — loading it in the
+      // parent page's <head> would leave it invisible in there.
+      canvas: {
+        scripts: ['https://cdn.jsdelivr.net/npm/plain-draggable@2.5.15/plain-draggable.min.js'],
+      },
+
+      // No default RTE toolbar (bold/italic/link/etc.) — text formatting
+      // now goes entirely through the custom Format Menu (the "curtain"
+      // panel), not GrapesJS's own bubble. Emptying `actions` removes
+      // both the buttons AND the keyboard shortcuts/commands behind
+      // them, so nothing from the old bar can show OR run.
+      richTextEditor: { actions: [] },
     });
 
     // ── PAGE SIZE SELECTOR ──
     document.getElementById('page-size-select').addEventListener('change', (e) => {
       pageConfig.size = e.target.value;
       applyPageStyle();
+      refreshGraphicBorderInstances();
+      reclampAllFreeTextBoxes();
       editor.trigger('pageConfig:change');
     });
 
@@ -720,6 +1303,8 @@
       document.body.classList.toggle('landscape', isLandscape);
 
       applyPageStyle();
+      refreshGraphicBorderInstances();
+      reclampAllFreeTextBoxes();
       editor.trigger('pageConfig:change');
     });
 
@@ -729,6 +1314,8 @@
         const v = parseFloat(e.target.value);
         pageConfig.margin[side] = Number.isFinite(v) && v >= 0 ? v : 0;
         applyPageStyle();
+        refreshGraphicBorderInstances();
+        reclampAllFreeTextBoxes();
         editor.trigger('pageConfig:change');
       });
     }
@@ -880,6 +1467,10 @@
         pinnedBorderPages.add(cid);
         editor.Css.setRule(`#${cid}`, buildLineBorderCSS(cfg));
       }
+
+      // Mutual exclusivity: this page (or all pages) now has a line
+      // border, so clear any graphic border already sitting on it.
+      getScopedTargetPages('lb-scope').forEach(pageComp => removeGraphicBorderFromPage(pageComp));
     });
 
     // ═══════════════════════════════════════════════════════
@@ -921,6 +1512,13 @@
     const GB_SIZE_MM = { Thin: 3, Small: 5, Medium: 8, Large: 12, Big: 16 };
 
     let selectedIconSlotId = null;
+
+    // ── LAST-APPLIED TRACKING — so the graphic border can be
+    // recomputed whenever a band's length changes (orientation
+    // switch, page size switch, margin edits) instead of leaving
+    // a gap or overflow from stale icon offsets. ──
+    let lastGraphicBorderCfg = null;              // { cfg, entry } from the most recent Apply
+    const graphicBorderAppliedPages = new Set();  // page component ids that currently carry icons
 
     // ── INSTANCE TRACKING STORE ──
     // One entry per icon actually placed on the page(s), in the shape
@@ -1033,6 +1631,163 @@
         .forEach(c => c.remove());
     }
 
+    // ═══════════════════════════════════════════════════════
+    // FREE TEXT — keep every box inside its page's content area
+    // (i.e. inside the page margin) at all times: clamp position
+    // while dragging/after resizing, and re-clamp whenever the
+    // content area itself changes shape (margin, orientation, size).
+    // ═══════════════════════════════════════════════════════
+
+    // Reads the box's rendered position against its DOM parent
+    // (.page-content — already inset by margin/border/padding, so
+    // it IS "the content area") and pulls it back inside if needed.
+    // Writes the clamped position straight to the DOM for an instant
+    // visual snap, then persists it on the model via addStyle so it
+    // survives re-render and export.
+    function clampFreeTextBox(comp) {
+      if (!comp || !comp.getClasses || !comp.getClasses().includes('free-text-box')) return;
+      const el = comp.getEl && comp.getEl();
+      const parentEl = el && el.parentElement;
+      if (!el || !parentEl) return;
+
+      const elRect = el.getBoundingClientRect();
+      const parentRect = parentEl.getBoundingClientRect();
+      if (!elRect.width && !elRect.height) return; // not rendered yet
+
+      const maxLeft = Math.max(0, parentRect.width  - elRect.width);
+      const maxTop  = Math.max(0, parentRect.height - elRect.height);
+
+      const left = Math.min(Math.max(0, elRect.left - parentRect.left), maxLeft);
+      const top  = Math.min(Math.max(0, elRect.top  - parentRect.top),  maxTop);
+
+      el.style.left = `${left}px`;
+      el.style.top  = `${top}px`;
+      comp.addStyle({ left: `${left}px`, top: `${top}px` });
+    }
+
+    // Same as clampFreeTextBox, but also persists width/height into the
+    // model — needed after a resize (whose updateTarget writes width/
+    // height straight to el.style for instant feedback, bypassing
+    // GrapesJS's model-backed style storage, so it'd silently revert on
+    // export otherwise). Kept OUT of the plain drag path on purpose:
+    // dragging here goes through the browser's native HTML5 drag-and-
+    // drop, and calling addStyle() — which re-renders the component —
+    // on every drag tick visibly disrupts an in-progress native drag.
+    function persistResizedFreeTextBox(comp) {
+      if (!comp || !comp.getClasses || !comp.getClasses().includes('free-text-box')) return;
+      const el = comp.getEl && comp.getEl();
+      if (!el) return;
+      const elRect = el.getBoundingClientRect();
+      if (!elRect.width && !elRect.height) return;
+      clampFreeTextBox(comp);
+      comp.addStyle({ width: `${elRect.width}px`, height: `${elRect.height}px` });
+    }
+
+    // Resolves whichever component GrapesJS's drag event handed us —
+    // different builds pass the model directly, or wrapped as
+    // { target }, so fall back to the current selection either way.
+    function resolveDragComponent(arg) {
+      if (arg && typeof arg.getEl === 'function') return arg;
+      if (arg && arg.target && typeof arg.target.getEl === 'function') return arg.target;
+      return editor.getSelected();
+    }
+
+    // Whole-box moving is PlainDraggable's job now (see the free-text
+    // component's `view` above), so there's no 'component:drag' to hook
+    // here anymore — only resize still goes through GrapesJS itself.
+    editor.on('component:resize', (arg) => persistResizedFreeTextBox(resolveDragComponent(arg)));
+
+    // ── TRACKER — re-run the clamp for every free text box on every
+    // page whenever the content area's own size changes (margin edit,
+    // orientation flip, page-size change), so a box that fit before a
+    // shrink doesn't end up spilling past the new, smaller margin. ──
+    function reclampAllFreeTextBoxes() {
+      getAllPageComponents().forEach(pageComp => {
+        const contentComp = pageComp.components().filter(c => c.getClasses().includes('page-content'))[0];
+        if (!contentComp) return;
+        contentComp.components().filter(c => c.getClasses().includes('free-text-box'))
+          .forEach(comp => {
+            clampFreeTextBox(comp);
+            // PlainDraggable caches its containment rect and only
+            // recalculates it automatically on window resize/scroll —
+            // a page-size, orientation or margin change here doesn't
+            // trigger either, so nudge it to re-measure directly.
+            const el = comp.getEl && comp.getEl();
+            if (el && el._plainDraggable) el._plainDraggable.position();
+          });
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // BORDER MUTUAL EXCLUSIVITY — a page only ever carries ONE
+    // border type. Applying a line border clears any graphic
+    // border on the same page(s), and applying a graphic border
+    // clears any line border on the same page(s). "No border"
+    // (on either tab) clears both. This is enforced live, every
+    // time either Apply button (or No border) fires.
+    // ═══════════════════════════════════════════════════════
+    const NO_BORDER_CSS = { border: 'none', 'border-radius': '0' };
+
+    // Pins an explicit "no border" #id override onto this page's
+    // .page-content — needed even under a global "all pages" line
+    // border, since a pinned rule always beats the class rule.
+    function removeLineBorderFromPage(pageComp) {
+      const contentComp = pageComp.components().filter(c => c.getClasses().includes('page-content'))[0];
+      if (!contentComp) return;
+      const cid = contentComp.getId();
+      pinnedBorderPages.add(cid);
+      editor.Css.setRule(`#${cid}`, NO_BORDER_CSS);
+    }
+
+    // Clears any icon instances from this page's 4 bands and drops it
+    // from the applied-pages tracker. Border-band THICKNESS is still a
+    // single global value shared by every page, so it's only reset to
+    // 0 once no page is using the graphic border anymore.
+    function removeGraphicBorderFromPage(pageComp) {
+      const frameComp = pageComp.components().filter(c => c.getClasses().includes('page-border-frame'))[0];
+      if (frameComp) {
+        ['bdr-top', 'bdr-bottom', 'bdr-left', 'bdr-right'].forEach(cls => {
+          const bandComp = frameComp.components().filter(c => c.getClasses().includes(cls))[0];
+          if (bandComp) clearBandInstances(bandComp);
+        });
+      }
+      graphicBorderAppliedPages.delete(pageComp.getId());
+      if (!graphicBorderAppliedPages.size) {
+        pageConfig.borderSize = 0;
+        applyPageStyle();
+      }
+    }
+
+    // Resolves the page(s) a tab's scope radio currently points at —
+    // shared by both Apply handlers and both "No border" buttons.
+    function getScopedTargetPages(scopeInputName) {
+      const scope = document.querySelector(`input[name="${scopeInputName}"]:checked`).value;
+      return scope === 'all' ? getAllPageComponents() : [getCurrentPageComponent()].filter(Boolean);
+    }
+
+    // "No border" — available on both tabs, clears whichever border
+    // type(s) the target page(s) currently have.
+    function handleNoBorder(scopeInputName) {
+      const scope = document.querySelector(`input[name="${scopeInputName}"]:checked`).value;
+      const targets = getScopedTargetPages(scopeInputName);
+      if (!targets.length) {
+        console.warn('No border: no page found.');
+        return;
+      }
+      if (scope === 'all') {
+        // Reset the global "all pages" line-border state too, so pages
+        // added later also start with no border instead of inheriting it.
+        lineBorderApplied = false;
+        applyPageStyle();
+      }
+      targets.forEach(pageComp => {
+        removeLineBorderFromPage(pageComp);
+        removeGraphicBorderFromPage(pageComp);
+      });
+    }
+    document.getElementById('btn-no-border-line').addEventListener('click', () => handleNoBorder('lb-scope'));
+    document.getElementById('btn-no-border-graphic').addEventListener('click', () => handleNoBorder('gb-scope'));
+
     function buildInstanceSvgHtml(entry, sizeMm, colorHex, instanceSlot, axis, offsetMm) {
       const posStyle = axis === 'x'
         ? `left:${offsetMm}mm; top:50%; transform:translateY(-50%);`
@@ -1073,6 +1828,23 @@
       });
     }
 
+    // ── REFLOW — re-run the graphic border for every page that already
+    // has one applied, reusing its own last-applied icon + config.
+    // applyGraphicBorderToPage() always reads fresh band lengths from
+    // computePageLayout(), so calling it again here just re-fits the
+    // existing icons to whatever the bands measure now — this is what
+    // makes portrait ↔ landscape (and page-size / margin) changes
+    // auto-recalculate instead of leaving a gap. ──
+    function refreshGraphicBorderInstances() {
+      if (!lastGraphicBorderCfg || !graphicBorderAppliedPages.size) return;
+      const { cfg, entry } = lastGraphicBorderCfg;
+      getAllPageComponents().forEach(pageComp => {
+        if (graphicBorderAppliedPages.has(pageComp.getId())) {
+          applyGraphicBorderToPage(pageComp, cfg, entry);
+        }
+      });
+    }
+
     // ── APPLY ──
     document.getElementById('btn-apply-graphic-border').addEventListener('click', () => {
       const entry = BORDER_SVGS.find(e => e.slotId === selectedIconSlotId);
@@ -1103,6 +1875,15 @@
         return;
       }
       targets.forEach(pageComp => applyGraphicBorderToPage(pageComp, cfg, entry));
+
+      // Remember what was just applied (and to which pages) so a later
+      // orientation/size/margin change can reflow these same icons.
+      lastGraphicBorderCfg = { cfg, entry };
+      targets.forEach(pageComp => graphicBorderAppliedPages.add(pageComp.getId()));
+
+      // Mutual exclusivity: this page (or all pages) now has a graphic
+      // border, so clear any line border already sitting on it.
+      targets.forEach(pageComp => removeLineBorderFromPage(pageComp));
     });
 
     // ═══════════════════════════════════════════════════════
@@ -1160,6 +1941,279 @@
         }
       }
     });
+
+    // A free-floating, editable text box — transparent background,
+    // dashed guide border (canvas-only, shown only on hover/focus,
+    // stripped on print/export), double-click to type (inherits the
+    // built-in 'text' type's RTE). Resizing (8 handles) is still
+    // GrapesJS's own resizer — that works correctly (see the custom
+    // updateTarget below). Whole-box MOVING is handled entirely by
+    // PlainDraggable (github.com/anseki/plain-draggable, loaded into
+    // the canvas iframe via canvas.scripts above; wired up in `view`
+    // below) instead of GrapesJS's own absolute-drag: that kept hitting
+    // version-specific internal assumptions (unit parsing in
+    // CommandComponentDrag.getPosition, native-HTML5-DnD side effects)
+    // that were fighting us. `draggable: false` here turns GrapesJS's
+    // own move-by-drag OFF for this component so the two don't compete.
+    // No default toolbar (select-parent/move/clone/delete icons) —
+    // dragging works directly off the box itself; delete still works
+    // via the Backspace/Delete key on a selected box.
+    editor.Components.addType('free-text', {
+      extend: 'text',
+      isComponent: el => el.getAttribute && el.getAttribute('data-gjs-type') === 'free-text',
+      model: {
+        defaults: {
+          tagName: 'div',
+          attributes: { class: 'free-text-box', 'data-gjs-type': 'free-text' },
+          droppable: false,
+          draggable: false,
+          removable: true,
+          copyable: true,
+          selectable: true,
+          hoverable: true,
+          editable: true,
+          // Plain `resizable: true` only ever changes width/height — it
+          // never moves top/left. That's fine for the br/bc/cr handles
+          // (the anchor corner/edge is the opposite one, so top/left can
+          // stay put) but tl/tc/cl need the box's top/left to shift too,
+          // or the box just grows toward the bottom-right no matter which
+          // handle you drag — which looks exactly like "top and left
+          // don't work". updateTarget below writes the resizer's
+          // already-computed rect (it accounts for which handle was
+          // used) straight to the element, so all 8 handles move it.
+          resizable: {
+            tl: 1, tc: 1, tr: 1, cl: 1, cr: 1, bl: 1, bc: 1, br: 1,
+            // GrapesJS's resizer passes the computed rect with SHORT keys
+            // (w/h/t/l), not width/height/top/left — reading the long
+            // names silently produced "undefinedpx" and killed resizing
+            // outright. Read both forms defensively so this keeps working
+            // across GrapesJS versions that may name them either way.
+            updateTarget: (el, rect) => {
+              const width  = rect.width  ?? rect.w;
+              const height = rect.height ?? rect.h;
+              const top    = rect.top    ?? rect.t;
+              const left   = rect.left   ?? rect.l;
+              if (width  != null) el.style.width  = `${width}px`;
+              if (height != null) el.style.height = `${height}px`;
+              if (top    != null) el.style.top    = `${top}px`;
+              if (left   != null) el.style.left   = `${left}px`;
+            },
+          },
+          toolbar: [],
+          // No hover/selected name badge ("Free-text") either — the
+          // format-menu trigger button (wired up below) is the only
+          // overlay this box shows now.
+          badgable: false,
+          style: {
+            position: 'absolute',
+            // top/left MUST be px, not mm: GrapesJS's whole-box drag
+            // (CommandComponentDrag.getPosition) reads these two
+            // properties with a plain parseFloat(), assuming the number
+            // is already pixels. parseFloat('20mm') silently returns 20
+            // — read as 20px — while the box actually renders ~76px
+            // from the edge, so a drag starts ~56px off from where the
+            // box visually is and immediately pins against the "can't
+            // go past the edge" clamp on the top/left side, leaving only
+            // rightward/downward movement visible. 76px ≈ 20mm at 96dpi,
+            // so this keeps the same default placement.
+            // min-width/min-height/padding/font-size aren't read this
+            // way (the resizer measures real rendered pixels instead),
+            // so mm is safe to keep for those.
+            top: '76px',
+            left: '76px',
+            'min-width': '30mm',
+            'min-height': '8mm',
+            padding: '1mm 2mm',
+            'font-size': '4mm',
+          },
+          content: 'Text',
+        }
+      },
+      view: {
+        // NOT onRender(): GrapesJS builds a component's element and
+        // calls onRender() *before* it's actually inserted into the
+        // iframe's live DOM (it gets appended right after, by the
+        // caller). PlainDraggable checks compareDocumentPosition(...) &
+        // DOCUMENT_POSITION_DISCONNECTED and throws "This element is not
+        // accepted" on a still-detached node — which is exactly what was
+        // happening. 'component:mount' (bound below, outside addType)
+        // fires right after the real appendChild, so the element is
+        // guaranteed live by then.
+        // `plain-draggable.min.js` is also loaded asynchronously into the
+        // canvas iframe (canvas.scripts, in the editor config above) —
+        // it may well not have finished loading yet the first time an
+        // early component mounts, so retry briefly instead of assuming
+        // it's ready.
+        setupPlainDraggable(triesLeft = 40) {
+          const el = this.el;
+          if (!el || el._plainDraggable) return;
+          const win = el.ownerDocument.defaultView;
+          if (win && win.PlainDraggable) {
+            this.initPlainDraggable(win);
+          } else if (triesLeft > 0) {
+            setTimeout(() => this.setupPlainDraggable(triesLeft - 1), 50);
+          }
+        },
+        initPlainDraggable(win) {
+          const el = this.el;
+          if (el._plainDraggable) return;
+          const model = this.model;
+          const instance = new win.PlainDraggable(el, {
+            // Move style.left/style.top directly (matching the rest of
+            // this app's positioning) instead of PlainDraggable's
+            // default `translate` CSS.
+            leftTop: true,
+            // Defaults to the element's own parent already, but named
+            // explicitly since that's exactly "stay inside the page's
+            // content area" — the same boundary clampFreeTextBox enforces
+            // for resize.
+            containment: el.parentElement || undefined,
+            onDragEnd: (pos) => {
+              // PlainDraggable only touches the DOM directly; persist the
+              // final position into the model so it survives re-render
+              // and export.
+              model.addStyle({
+                left: `${Math.round(pos.left)}px`,
+                top: `${Math.round(pos.top)}px`,
+              });
+            },
+          });
+          el._plainDraggable = instance;
+          // The built-in 'text' type's RTE toggle (see rte:enable/disable
+          // below) resets the raw DOM `draggable` attribute to `true`
+          // whenever editing stops, for its own native-HTML5-drag scheme
+          // — which we don't want here, since it can hijack the mouse
+          // gesture before PlainDraggable's own mousedown handling gets
+          // it. Keep it forced off.
+          el.draggable = false;
+        },
+        removed() {
+          const el = this.el;
+          if (el && el._plainDraggable) {
+            el._plainDraggable.remove();
+            delete el._plainDraggable;
+          }
+        },
+      },
+    });
+
+    // Fires only after a component's element is actually appended into
+    // the iframe's live DOM (unlike the view's own onRender(), which
+    // runs first) — see the comment on the free-text type's `view`
+    // above for why that timing matters here.
+    editor.on('component:mount', (model) => {
+      if (!model.getClasses || !model.getClasses().includes('free-text-box')) return;
+      const view = model.getView && model.getView();
+      if (view && view.setupPlainDraggable) view.setupPlainDraggable();
+    });
+
+    // Suspend PlainDraggable while the box is being typed into (RTE
+    // edit mode) so selecting/clicking through text doesn't drag the
+    // whole box, and re-force `draggable = false` afterward — see the
+    // comment in initPlainDraggable above for why that's necessary.
+    editor.on('rte:enable', (view) => {
+      const el = view && view.el;
+      if (el && el._plainDraggable) el._plainDraggable.disabled = true;
+    });
+    editor.on('rte:disable', (view) => {
+      const el = view && view.el;
+      if (el && el._plainDraggable) {
+        el._plainDraggable.disabled = false;
+        el.draggable = false;
+      }
+    });
+
+    // ═══════════════════════════════════════════════════════
+    // FREE TEXT — FORMAT MENU TRIGGER
+    // Shows a small button, positioned over the box's own corner,
+    // only while the box is BOTH selected (gjs-selected) AND
+    // currently hovered. Clicking it opens the Format Menu ("curtain",
+    // defined earlier in <body>) targeted at that same box. This is
+    // meant to generalize to other component types later — free-text
+    // is just the first one wired up to it.
+    // ═══════════════════════════════════════════════════════
+    let formatMenuTarget = null; // the component the curtain is currently editing
+
+    function ensureFormatMenuTriggerBtn() {
+      const doc = editor.Canvas.getDocument();
+      if (!doc) return null;
+      let btn = doc.getElementById('ft-format-trigger');
+      if (btn) return btn;
+      btn = doc.createElement('button');
+      btn.id = 'ft-format-trigger';
+      btn.type = 'button';
+      btn.title = 'Format text';
+      btn.innerHTML = '<i class="bi bi-fonts"></i>';
+      btn.style.cssText = [
+        'position:absolute', 'z-index:99999', 'display:none',
+        'width:26px', 'height:26px', 'border-radius:6px',
+        'align-items:center', 'justify-content:center',
+        'background:#e94560', 'color:#fff', 'border:1px solid #e94560',
+        'font-size:13px', 'line-height:1', 'cursor:pointer', 'padding:0',
+        'box-shadow:0 2px 6px rgba(0,0,0,.4)',
+      ].join(';');
+      // Keep the click from also landing on the canvas underneath (which
+      // would deselect the box or start a drag instead of opening the menu).
+      ['mousedown', 'click'].forEach(evt => {
+        btn.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); });
+      });
+      btn.addEventListener('click', () => openFormatMenuFor(editor.getSelected()));
+      doc.body.appendChild(btn);
+      return btn;
+    }
+
+    function positionFormatMenuTrigger(boxEl) {
+      const btn = ensureFormatMenuTriggerBtn();
+      if (!btn) return;
+      const doc = boxEl.ownerDocument;
+      const win = doc.defaultView;
+      const scrollX = (win && win.scrollX) || doc.documentElement.scrollLeft || 0;
+      const scrollY = (win && win.scrollY) || doc.documentElement.scrollTop || 0;
+      const rect = boxEl.getBoundingClientRect();
+      btn.style.display = 'flex';
+      btn.style.left = `${rect.right - 26 + scrollX}px`;
+      btn.style.top  = `${Math.max(0, rect.top - 30) + scrollY}px`;
+    }
+
+    function hideFormatMenuTrigger() {
+      const doc = editor.Canvas.getDocument();
+      const btn = doc && doc.getElementById('ft-format-trigger');
+      if (btn) btn.style.display = 'none';
+    }
+
+    function openFormatMenuFor(comp) {
+      if (!comp) return;
+      formatMenuTarget = comp;
+      document.getElementById('curtain').classList.add('show');
+    }
+
+    function wireFreeTextFormatMenuTrigger() {
+      const doc = editor.Canvas.getDocument();
+      if (!doc) return;
+
+      doc.addEventListener('mouseover', (e) => {
+        const boxEl = e.target.closest && e.target.closest('.free-text-box');
+        if (!boxEl || !boxEl.classList.contains('gjs-selected')) return;
+        positionFormatMenuTrigger(boxEl);
+      });
+
+      doc.addEventListener('mouseout', (e) => {
+        const boxEl = e.target.closest && e.target.closest('.free-text-box');
+        if (!boxEl) return;
+        const to = e.relatedTarget;
+        if (to && to.id === 'ft-format-trigger') return; // moving onto the button itself
+        hideFormatMenuTrigger();
+      });
+
+      // Dragging/resizing invalidates the trigger's position — hide it
+      // on mousedown inside the box and let the next hover reposition it.
+      doc.addEventListener('mousedown', (e) => {
+        if (e.target.closest && e.target.closest('.free-text-box')) hideFormatMenuTrigger();
+      }, true);
+    }
+
+    editor.on('load', wireFreeTextFormatMenuTrigger);
+    editor.on('component:deselected', hideFormatMenuTrigger);
 
     // ═══════════════════════════════════════════════════════
     // CANVAS + PAGE STYLE — reads geometry from computePageLayout()
@@ -1283,6 +2337,28 @@
           box-shadow: none !important;
         }
 
+        /* ── FREE TEXT BOX — transparent, freely draggable/resizable,
+           editable. Border stays fully transparent (no visible guide)
+           until the box is hovered, focused (mid-edit), or selected —
+           border-box sizing keeps the 1px reserved either way so
+           nothing shifts when it appears. Capped to its parent's
+           content box so it can never be resized past it. ── */
+        .free-text-box {
+          position: absolute;
+          background: transparent;
+          border: 1px dashed transparent;
+          max-width: 100%;
+          max-height: 100%;
+          cursor: move;
+          box-sizing: border-box;
+        }
+        .free-text-box:hover,
+        .free-text-box:focus,
+        .free-text-box.gjs-comp-editing,
+        .free-text-box.gjs-selected {
+          border-color: var(--accent2);
+        }
+
         /* ── PRINT — non-negotiable, always emitted ── */
         @media print {
           body {
@@ -1310,6 +2386,7 @@
              in print once a real line border has been applied. */
           .page-border-frame { border-color: transparent !important; }
           ${lineBorderApplied ? '' : '.page-content { border-color: transparent !important; }'}
+          .free-text-box { border-color: transparent !important; }
         }
       `;
     }
@@ -1363,6 +2440,24 @@
       editor.getWrapper().append(buildPageHTML());
     });
 
+    // ── ADD TEXT — drops a transparent, editable, freely-draggable text
+    // box into the focused page's content zone. Each add is nudged a
+    // little further down/right so repeats don't land exactly on top
+    // of each other. ──
+    document.getElementById('btn-add-text').addEventListener('click', () => {
+      const contentComp = getCurrentPageContentComponent();
+      if (!contentComp) {
+        console.warn('Add Text: no current page found to add to.');
+        return;
+      }
+      const existing = contentComp.components().filter(c => c.getClasses().includes('free-text-box')).length;
+      const step = (existing % 6) * 8; // mm
+      const [added] = contentComp.append({ type: 'free-text' });
+      added.addStyle({ top: `${20 + step}mm`, left: `${20 + step}mm` });
+      editor.select(added);
+      clampFreeTextBox(added); // in case the cascading offset lands outside a small page
+    });
+
     // ═══════════════════════════════════════════════════════
     // EXPORT — bundles editor HTML/CSS + the injected page-style
     // tag into a single standalone .html file.
@@ -1380,7 +2475,13 @@
         .join('\n');
 
       const html = editor.getHtml();
-      const css  = editor.getCss() + '\n' + injectedCss;
+      const css  = editor.getCss() + '\n' + injectedCss
+        // Export-only guarantee: strip the free-text guide border for
+        // good — no hover/focus/selected state exists in a static
+        // export, but this makes the "no border" outcome explicit and
+        // immune to anything upstream in the cascade.
+        + '\n.free-text-box, .free-text-box:hover, .free-text-box:focus, .free-text-box:active '
+        + '{ border: none !important; cursor: default !important; }';
 
       const blob = new Blob([`<style>${css}</style>${html}`], { type: 'text/html' });
       const a = document.createElement('a');
